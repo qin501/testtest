@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wsq.mapper.FriendrequestMapper">
+    <!--获取所有的数据-->
+    <select id="getList" resultType="friendrequest">
+        select * from friendrequest
+    </select>
+    <!--根据id更新-->
+    <update id="updateFriendrequest" parameterType="friendrequest">
+        update friendrequest
+            <set>
+                <if test="sendId!=null and sendId != ''">
+                       	sendId=#{sendId},
+                </if>
+                <if test="acceptId!=null and acceptId != ''">
+                       	acceptId=#{acceptId},
+                </if>
+                <if test="request_data_time!=null">
+                       	request_data_time=#{request_data_time},
+                </if>
+
+            </set>
+            where id=#{id}
+    </update>
+    <!--添加数据-->
+    <insert id="addFriendrequest" parameterType="friendrequest" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        insert into friendrequest
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="sendId!=null and sendId != ''">
+                       	sendId ,
+                </if>
+                <if test="acceptId!=null and acceptId != ''">
+                       	acceptId ,
+                </if>
+                <if test="request_data_time!=null">
+                       	request_data_time ,
+                </if>
+
+            </trim>
+        values
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="sendId!=null and sendId != ''">
+                       #{sendId} ,
+                </if>
+                <if test="acceptId!=null and acceptId != ''">
+                       #{acceptId} ,
+                </if>
+                <if test="request_data_time!=null">
+                       #{request_data_time} ,
+                </if>
+
+            </trim>
+
+    </insert>
+    <!--根据id删除数据-->
+    <delete id="deleteFriendrequest" parameterType="String">
+          delete from friendrequest where id=#{value}
+    </delete>
+    <!--根据实体类对象查询-->
+    <select id="searchByEntity" parameterType="friendrequest" resultType="friendrequest">
+        select * from friendrequest
+        <where>
+                <if test="id!=null and id != ''">
+                       and id like concat('%',#{id},'%')
+                </if>
+                <if test="sendId!=null and sendId != ''">
+                       and sendId like concat('%',#{sendId},'%')
+                </if>
+                <if test="acceptId!=null and acceptId != ''">
+                       and acceptId like concat('%',#{acceptId},'%')
+                </if>
+                <if test="request_data_time!=null">
+                       and request_data_time like concat('%',#{request_data_time},'%')
+                </if>
+
+        </where>
+    </select>
+    <!--根据Id获取-->
+    <select id="getFriendrequestById" parameterType="String" resultType="friendrequest">
+        select * from friendrequest where id=#{value}
+    </select>
+</mapper>
