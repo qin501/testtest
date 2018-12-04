@@ -3,7 +3,9 @@ package cn.wsq.service.impl;
 import cn.wsq.common.Result;
 import cn.wsq.common.TableResult;
 import cn.wsq.common.TrimSpace;
+import cn.wsq.entity.Friends;
 import cn.wsq.entity.User;
+import cn.wsq.mapper.FriendsMapper;
 import cn.wsq.mapper.UserMapper;
 import cn.wsq.service.UserService;
 import cn.wsq.util.JSONResult;
@@ -20,6 +22,8 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private FriendsMapper friendsMapper;
 
     /*
     * offset从第几条开始
@@ -133,5 +137,11 @@ public class UserServiceImpl implements UserService {
         }else{
             return JSONResult.errorMsg("用户名或密码错误了");
         }
+    }
+
+    @Override
+    public List<Friends> getFriendList(String id) {
+        
+        return null;
     }
 }

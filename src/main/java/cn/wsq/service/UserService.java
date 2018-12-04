@@ -2,6 +2,7 @@ package cn.wsq.service;
 
 import cn.wsq.common.Result;
 import cn.wsq.common.TableResult;
+import cn.wsq.entity.Friends;
 import cn.wsq.entity.User;
 import cn.wsq.util.JSONResult;
 
@@ -39,4 +40,6 @@ public interface UserService {
     public TableResult<User> getSearchPage(int offset, int limit, User user);
 
     public JSONResult login(User user);
+
+    List<Friends> getFriendList(String id);
 }
