@@ -29,4 +29,6 @@ public interface FriendrequestMapper {
     * 根据Id获取
     * */
     public Friendrequest getFriendrequestById(String id);
+    //精确查询
+    public List<Friendrequest> queryByEntity(Friendrequest friendrequest);
 }

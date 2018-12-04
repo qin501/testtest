@@ -8,6 +8,7 @@ import cn.wsq.entity.User;
 import cn.wsq.mapper.FriendsMapper;
 import cn.wsq.mapper.UserMapper;
 import cn.wsq.service.UserService;
+import cn.wsq.util.IDUtils;
 import cn.wsq.util.JSONResult;
 import cn.wsq.util.MD5Utils;
 import com.github.pagehelper.PageHelper;
@@ -15,8 +16,10 @@ import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
@@ -120,7 +123,7 @@ public class UserServiceImpl implements UserService {
         if(StringUtils.isNotBlank(user.getUsername())&&StringUtils.isNotBlank(user.getPassword())){
             User u=new User();
             user.setUsername(user.getUsername());
-            List<User> users = userMapper.searchByEntity(u);
+            List<User> users = userMapper.queryByEntity(u);
             //查找不到用户
             if(users==null||users.size()==0)return JSONResult.errorMsg("用户名或密码错误了");
             u=users.get(0);
@@ -143,5 +146,33 @@ public class UserServiceImpl implements UserService {
     public List<Friends> getFriendList(String id) {
         
         return null;
+    }
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public JSONResult userRegitser(User user) {
+        if(user==null)return JSONResult.errorMsg("用户名或密码错误了");
+        if(StringUtils.isNotBlank(user.getUsername())&&StringUtils.isNotBlank(user.getPassword())
+        &&StringUtils.isNotBlank(user.getNickname())) {
+            User u=new User();
+            u.setUsername(user.getUsername());
+            List<User> users = userMapper.queryByEntity(u);
+            //没有此用户
+            if(users==null||users.size()==0){
+                user.setId(IDUtils.getId());
+                user.setCreateDate(new Date());
+                try {
+                    user.setPassword(MD5Utils.getMD5Str(user.getPassword()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                userMapper.addUser(user);
+            }else{
+                return JSONResult.errorMsg("用户名已存在，请重试");
+            }
+            return JSONResult.ok("注册成功");
+
+        }else {
+            return JSONResult.errorMsg("传入的参数有误");
+        }
     }
 }

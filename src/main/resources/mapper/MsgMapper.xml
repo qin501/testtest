@@ -11,6 +11,9 @@
     <update id="updateMsg" parameterType="msg">
         update msg
             <set>
+                <if test="id!=null and id != ''">
+                       	id=#{id},
+                </if>
                 <if test="sendId!=null and sendId != ''">
                        	sendId=#{sendId},
                 </if>
@@ -30,10 +33,13 @@
             </set>
             where id=#{id}
     </update>
-    <!--添加数据-->
-    <insert id="addMsg" parameterType="msg" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    <!--添加数据 keyColumn="id" keyProperty="id" useGeneratedKeys="true"-->
+    <insert id="addMsg" parameterType="msg" >
         insert into msg
             <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id!=null and id != ''">
+                       	id ,
+                </if>
                 <if test="sendId!=null and sendId != ''">
                        	sendId ,
                 </if>
@@ -53,6 +59,9 @@
             </trim>
         values
             <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id!=null and id != ''">
+                       #{id} ,
+                </if>
                 <if test="sendId!=null and sendId != ''">
                        #{sendId} ,
                 </if>
@@ -105,4 +114,30 @@
     <select id="getMsgById" parameterType="String" resultType="msg">
         select * from msg where id=#{value}
     </select>
+    <!--精确查询-->
+    <select id="queryByEntity" parameterType="msg" resultType="msg">
+        select * from msg
+        <where>
+                <if test="id!=null and id != ''">
+                       and id=#{id}
+                </if>
+                <if test="sendId!=null and sendId != ''">
+                       and sendId=#{sendId}
+                </if>
+                <if test="acceptId!=null and acceptId != ''">
+                       and acceptId=#{acceptId}
+                </if>
+                <if test="msg!=null and msg != ''">
+                       and msg=#{msg}
+                </if>
+                <if test="signFlag!=null and signFlag != ''">
+                       and signFlag=#{signFlag}
+                </if>
+                <if test="createTime!=null">
+                       and createTime=#{createTime}
+                </if>
+
+        </where>
+    </select>
+
 </mapper>

@@ -11,6 +11,9 @@
     <update id="updateFriendrequest" parameterType="friendrequest">
         update friendrequest
             <set>
+                <if test="id!=null and id != ''">
+                       	id=#{id},
+                </if>
                 <if test="sendId!=null and sendId != ''">
                        	sendId=#{sendId},
                 </if>
@@ -24,10 +27,13 @@
             </set>
             where id=#{id}
     </update>
-    <!--添加数据-->
-    <insert id="addFriendrequest" parameterType="friendrequest" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    <!--添加数据 keyColumn="id" keyProperty="id" useGeneratedKeys="true"-->
+    <insert id="addFriendrequest" parameterType="friendrequest" >
         insert into friendrequest
             <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id!=null and id != ''">
+                       	id ,
+                </if>
                 <if test="sendId!=null and sendId != ''">
                        	sendId ,
                 </if>
@@ -41,6 +47,9 @@
             </trim>
         values
             <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id!=null and id != ''">
+                       #{id} ,
+                </if>
                 <if test="sendId!=null and sendId != ''">
                        #{sendId} ,
                 </if>
@@ -81,4 +90,24 @@
     <select id="getFriendrequestById" parameterType="String" resultType="friendrequest">
         select * from friendrequest where id=#{value}
     </select>
+    <!--精确查询-->
+    <select id="queryByEntity" parameterType="friendrequest" resultType="friendrequest">
+        select * from friendrequest
+        <where>
+                <if test="id!=null and id != ''">
+                       and id=#{id}
+                </if>
+                <if test="sendId!=null and sendId != ''">
+                       and sendId=#{sendId}
+                </if>
+                <if test="acceptId!=null and acceptId != ''">
+                       and acceptId=#{acceptId}
+                </if>
+                <if test="request_data_time!=null">
+                       and request_data_time=#{request_data_time}
+                </if>
+
+        </where>
+    </select>
+
 </mapper>

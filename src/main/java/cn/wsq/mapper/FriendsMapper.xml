@@ -11,6 +11,9 @@
     <update id="updateFriends" parameterType="friends">
         update friends
             <set>
+                <if test="id!=null and id != ''">
+                       	id=#{id},
+                </if>
                 <if test="userId!=null and userId != ''">
                        	userId=#{userId},
                 </if>
@@ -24,10 +27,13 @@
             </set>
             where id=#{id}
     </update>
-    <!--添加数据-->
-    <insert id="addFriends" parameterType="friends" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    <!--添加数据 keyColumn="id" keyProperty="id" useGeneratedKeys="true"-->
+    <insert id="addFriends" parameterType="friends" >
         insert into friends
             <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id!=null and id != ''">
+                       	id ,
+                </if>
                 <if test="userId!=null and userId != ''">
                        	userId ,
                 </if>
@@ -41,6 +47,9 @@
             </trim>
         values
             <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id!=null and id != ''">
+                       #{id} ,
+                </if>
                 <if test="userId!=null and userId != ''">
                        #{userId} ,
                 </if>
@@ -81,4 +90,24 @@
     <select id="getFriendsById" parameterType="String" resultType="friends">
         select * from friends where id=#{value}
     </select>
+    <!--精确查询-->
+    <select id="queryByEntity" parameterType="friends" resultType="friends">
+        select * from friends
+        <where>
+                <if test="id!=null and id != ''">
+                       and id=#{id}
+                </if>
+                <if test="userId!=null and userId != ''">
+                       and userId=#{userId}
+                </if>
+                <if test="friendId!=null and friendId != ''">
+                       and friendId=#{friendId}
+                </if>
+                <if test="alias!=null and alias != ''">
+                       and alias=#{alias}
+                </if>
+
+        </where>
+    </select>
+
 </mapper>

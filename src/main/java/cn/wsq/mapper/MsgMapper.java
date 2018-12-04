@@ -29,4 +29,6 @@ public interface MsgMapper {
     * 根据Id获取
     * */
     public Msg getMsgById(String id);
+    //精确查询
+    public List<Msg> queryByEntity(Msg msg);
 }

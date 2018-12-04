@@ -29,4 +29,6 @@ public interface UserMapper {
     * 根据Id获取
     * */
     public User getUserById(String id);
+    //精确查询
+    public List<User> queryByEntity(User user);
 }

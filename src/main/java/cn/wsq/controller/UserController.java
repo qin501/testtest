@@ -31,6 +31,15 @@ public class UserController {
         }
         return result;
     }
+    /*
+    * 用户注册实现
+    * */
+    @RequestMapping("/register")
+    public JSONResult userRegitser(@RequestBody User user){
+        JSONResult result=userService.userRegitser(user);
+        return result;
+    }
+
     public JSONResult getFriendList(HttpServletRequest request){
         User userLogin = (User) request.getSession().getAttribute("userLogin");
         if(userLogin==null){

@@ -14,6 +14,7 @@
     <!--  生产环境版本，优化了尺寸和速度
      <script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
     <script type="text/javascript" src="./js/sweetalert2.min.js"></script>
+    <script src="./js/axios.min.js"></script>
 
 </head>
 <body>
@@ -21,7 +22,7 @@
 <div id="particles-js">
     <div id="loginpage" class="login">
         <div class="login-top" style="padding-left: 150px;">
-            登录
+            注册
         </div>
         <div class="login-center clearfix">
             <div class="login-center-img"><img src="img/name.png"/></div>
@@ -40,7 +41,7 @@
         <div class="login-center clearfix">
             <div class="login-center-img"><img src="img/name.png"/></div>
             <div class="login-center-input">
-                <input type="nickname" name=""value="" v-model="password" placeholder="请输入昵称" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的密码'"/>
+                <input type="nickname" name=""value="" v-model="nickname" placeholder="请输入昵称" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的昵称'"/>
                 <div class="login-center-input-text">昵称</div>
             </div>
         </div>
@@ -50,8 +51,8 @@
                 <a href="javascript:void(0)" v-on:click="login">现在登录</a>
             </p>
         </div>
-        <div class="login-button" v-on:click="login">
-            登陆
+        <div class="login-button" v-on:click="register">
+            注册
         </div>
     </div>
     <div class="sk-rotating-plane"></div>
@@ -65,10 +66,14 @@
         el:'#loginpage',
         data:{
             username:'',
-            password:''
+            password:'',
+            nickname:''
         },
         methods:{
             login:function () {
+                location.href='loginPage';
+            },
+            register:function () {
                 if(this.username.length==0){
                     swal('请输入用户名','','warning');
                     return;
@@ -77,9 +82,30 @@
                     swal('请输入密码','','warning');
                     return;
                 }
-            },
-            register:function () {
-                alert(11)
+                if(this.username.length<6||this.username.length>15){
+                    swal('用户名为6-15个字符','','warning');
+                    return;
+                }
+                if(this.password.length<6||this.password.length>15){
+                    swal('密码为6-15个字符','','warning');
+                    return;
+                }
+                if(this.nickname.length<3||this.nickname.length>8){
+                    swal('昵称为3-8个字符','','warning');
+                    return;
+                }
+                axios.post('user/register',{'username':this.username,'password':this.password,'nickname':this.nickname})
+                    .then(function (response) {
+                        if(response.data.status==200){
+                            location.href='login.html';
+                        }else{
+                            swal(response.data.msg,'','error');
+                        }
+                    })
+                    .catch(function (error) {
+                        swal('系统出错','','error');
+                    })
+
             }
         }
     });
