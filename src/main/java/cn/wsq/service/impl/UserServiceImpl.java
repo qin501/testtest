@@ -118,11 +118,12 @@ public class UserServiceImpl implements UserService {
     * 登录功能检验
     * */
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
     public JSONResult login(User user) {
         if(user==null)return JSONResult.errorMsg("用户名或密码错误了");
         if(StringUtils.isNotBlank(user.getUsername())&&StringUtils.isNotBlank(user.getPassword())){
             User u=new User();
-            user.setUsername(user.getUsername());
+            u.setUsername(user.getUsername());
             List<User> users = userMapper.queryByEntity(u);
             //查找不到用户
             if(users==null||users.size()==0)return JSONResult.errorMsg("用户名或密码错误了");
