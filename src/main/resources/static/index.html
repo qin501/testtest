@@ -5,6 +5,13 @@
 <title>仿pc端微信网页版聊天界面代码</title>
 <link rel="stylesheet" href="css/amazeui.min.css" />
 <link rel="stylesheet" href="css/main.css" />
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+   <!--  生产环境版本，优化了尺寸和速度
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
+    <script type="text/javascript" src="./js/sweetalert2.min.js"></script>
+    <!--vue2.0推荐我的使用的ajax-->
+    <script src="./js/axios.min.js"></script>
 </head>
 <body>
 <div class="box">
@@ -173,7 +180,7 @@
 		</div>
 		
 		<!--好友列表-->
-		<div class="middle">
+		<div class="middle" id="friendList">
 			<div class="wx_search">
 				<input type="text" placeholder="搜索"/>
 				<button>+</button>
@@ -189,15 +196,7 @@
 							</div>
 						</div>
 					</li>
-					<li>
-						<p>公众号</p>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/2.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">公众号</p>
-							</div>
-						</div>
-					</li>
+
 					<li>
 						<p>A</p>
 						<div class="friends_box">
@@ -206,19 +205,8 @@
 								<p class="user_name">彭于晏丶plus</p>
 							</div>
 						</div>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/4.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">陈依依</p>
-							</div>
-						</div>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/5.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">毛毛</p>
-							</div>
-						</div>
 					</li>
+
 					<li>
 						<p>B</p>
 						<div class="friends_box">
@@ -414,6 +402,59 @@ window.onload=function(){
 	b();
 };
 </script>
+
+<script>
+/*
+* 					<li>
+  						<p>A</p>
+  						<div class="friends_box">
+  							<div class="user_head"><img src="images/head/3.jpg"/></div>
+  							<div class="friends_text">
+  								<p class="user_name">彭于晏丶plus</p>
+  							</div>
+  						</div>
+  					</li>
+* */
+/*
+* 聊天列表
+* */
+    Vue.component('friendListComponent',{
+        props:['postfriendList'],
+        template:
+         '<li>\n'+
+          '<p>A</p>\n'+
+          '<div class="friends_box">\n'+
+          '<div class="user_head"><img src="images/head/3.jpg"/></div>\n'+
+          '<div class="friends_text">\n'+
+          '<p class="user_name">彭于晏丶plus</p>\n'+
+          '</div>\n'+
+          '</div>\n'+
+          '</li>'
+    })
+    new Vue({
+        el:'#friendList',
+        data:{
+            capital:''
+
+        },
+        methods:{
+          aa:function() {
+            alert('aa');
+          }
+        },
+        mounted:function() {
+            this.aa();
+          alert(111);
+        },
+        created:function() {
+            this.aa();
+          alert(222);
+        }
+    });
+</script>
+
+
+
 
 
 </body>
