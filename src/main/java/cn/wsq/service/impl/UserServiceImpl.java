@@ -6,6 +6,7 @@ import cn.wsq.common.TrimSpace;
 import cn.wsq.entity.User;
 import cn.wsq.mapper.UserMapper;
 import cn.wsq.service.UserService;
+import cn.wsq.util.JSONResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +103,15 @@ public class UserServiceImpl implements UserService {
         }catch (Exception e){
             e.printStackTrace();
         }
+        return null;
+    }
+
+    @Override
+    public JSONResult login(User user) {
+        User u=new User();
+
+        List<User> users = userMapper.searchByEntity(u);
+
         return null;
     }
 }
