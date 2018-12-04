@@ -7,8 +7,10 @@ import cn.wsq.entity.User;
 import cn.wsq.mapper.UserMapper;
 import cn.wsq.service.UserService;
 import cn.wsq.util.JSONResult;
+import cn.wsq.util.MD5Utils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,13 +107,31 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
-
+    /*
+    * 登录功能检验
+    * */
     @Override
     public JSONResult login(User user) {
-        User u=new User();
-
-        List<User> users = userMapper.searchByEntity(u);
-
-        return null;
+        if(user==null)return JSONResult.errorMsg("用户名或密码错误了");
+        if(StringUtils.isNotBlank(user.getUsername())&&StringUtils.isNotBlank(user.getPassword())){
+            User u=new User();
+            user.setUsername(user.getUsername());
+            List<User> users = userMapper.searchByEntity(u);
+            //查找不到用户
+            if(users==null||users.size()==0)return JSONResult.errorMsg("用户名或密码错误了");
+            u=users.get(0);
+            //登录成功
+            try {
+                if(MD5Utils.getMD5Str(user.getPassword()).equals(u.getPassword())){
+                    return JSONResult.ok(u);
+                }
+                return JSONResult.errorMsg("用户名或密码错误了");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return JSONResult.errorMsg("用户名或密码错误了");
+            }
+        }else{
+            return JSONResult.errorMsg("用户名或密码错误了");
+        }
     }
 }

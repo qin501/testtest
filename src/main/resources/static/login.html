@@ -73,15 +73,18 @@
                     swal('请输入密码','','warning');
                     return;
                 }
-                axios.post('user/login',this.data)
+                var requestData={"username":this.username,"password":this.password};
+                axios.post('user/login',requestData)
                     .then(function (response) {
-                        alert(111);
+                        if(response.data.status==200){
+                            location.href='index.html';
+                        }else{
+                            swal(response.data.msg,'','error');
+                        }
                     })
                     .catch(function (error) {
-
+                        location.href='login.html';
                     })
-
-
             },
             register:function () {
                 alert(11)

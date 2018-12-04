@@ -17,7 +17,7 @@ public class MD5Utils {
 
 	public static void main(String[] args) {
 		try {
-			String md51 = getMD5Str("main");
+			String md51 = getMD5Str("admin");
 			String md52 = getMD5Str("test1");
 			String md53 = getMD5Str("test2");
 			System.out.println(md51);
