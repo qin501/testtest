@@ -107,7 +107,7 @@
 
 
 						<li itemId="fou">
-							<a href="#"  data-am-modal="{target: '#doc-modal-4', closeViaDimmer: 0, width: 400, height: 170}">退出</a>
+							<a href="javascript:void(0)"  data-am-modal="{target: '#doc-modal-4', closeViaDimmer: 0, width: 400, height: 170}">退出</a>
 							<div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-4">
 								<div class="am-modal-dialog">
 									<div class="am-modal-hd">确定退出？
@@ -117,7 +117,7 @@
 										<input type="text" style="visibility: hidden;" class="form-control"  placeholder="占位">
 									</div>
 									<div class="modal-footer">
-										<button type="button" id="exit_submit" class="btn btn-primary" data-dismiss="modal" data-am-modal-close>确认</button>
+										<button type="button" id="exit_submit" v-on:click="exit_submit" class="btn btn-primary" data-dismiss="modal" data-am-modal-close>确认</button>
 										<button type="button" id="exit_cancel"class="btn btn-default" data-dismiss="modal"  data-am-modal-close>取消</button>
 									</div>
 
@@ -234,6 +234,10 @@
                     },
                     nick_cancel:function () {
                        this.txt_newname='';
+                    },//用户退出
+                    exit_submit:function () {
+                        axios.get('logout');
+                        location.href='loginPage'
                     }
                 }
             })
