@@ -79,7 +79,42 @@ public class UserController {
             result.setData(userLogin);
         }
         return result;
-
+    }
+    /*
+    * 获取新朋友列表
+    * */
+    @RequestMapping("getNewFriendList")
+    public JSONResult getNewFriendList(HttpServletRequest request){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        JSONResult result= userService.getNewFriendList(userLogin);
+        return result;
+    }
+    /*
+    * 保存好友请求
+    * */
+    @RequestMapping("saveFriendRequest")
+    public JSONResult saveFriendRequest(HttpServletRequest request,@RequestBody Friends friendId){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        JSONResult result= userService.saveFriendRequest(userLogin.getId(),friendId.getFriendId());
+        return result;
+    }
+    /*
+    * 拒绝好友请求
+    * */
+    @RequestMapping("refuseFriendRequest")
+    public JSONResult refuseFriendRequest(HttpServletRequest request,@RequestBody Friends friendId){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        JSONResult result= userService.refuseFriendRequest(userLogin.getId(),friendId.getFriendId());
+        return result;
     }
 
     public JSONResult getFriendList(HttpServletRequest request){

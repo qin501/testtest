@@ -270,14 +270,13 @@
 				<ul class="friends_list">
 					<li>
 						<p>新的朋友</p>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/1.jpg"/></div>
+						<div class="friends_box" v-for="friend in newfriendList" v-on:click="permissionFriend(friend.id)">
+							<div class="user_head"><img v-bind:src='friend.faceicon'/></div>
 							<div class="friends_text">
-								<p class="user_name">新的朋友</p>
+								<p class="user_name">{{friend.nickname}}</p>
 							</div>
 						</div>
 					</li>
-
 					<li>
 						<p>A</p>
 						<div class="friends_box">
@@ -438,7 +437,8 @@
     var chatmodal=new Vue({
         el:'#webchat',
         data:{
-            userInfo:{},
+            userInfo:{},//用户登录信息
+			newfriendList:[],//新朋友列表
             innerHtml:'',//请求好友信息的html
             userId:'',//请求好友的id
             requestusername:'',//请求的好友username
@@ -450,6 +450,8 @@
                 swal('用户没有登录','','error')
                 location.href='loginPage';
 			}*/
+          //获取好友请求表
+          	this.getNewFriendList();
 
 		},
         methods:{
@@ -462,6 +464,63 @@
                 var str=JSON.stringify(data);
 				localStorage.setItem("userInfo",str);
 				this.userInfo=data;
+			},
+			//获取新朋友列表
+			getNewFriendList:function(){
+                axios.get('user/getNewFriendList')
+					.then(function (response) {
+                        if(response.data.status==200){
+                            chatmodal.newfriendList=response.data.data;
+                            return;
+                        }
+                        swal('系统出错了','','error');
+
+					})
+					.catch(function (reason) {
+                        swal('系统出错了','','error');
+				})
+			},
+			//同意好友请求
+            permissionFriend:function(friendId){
+                swal({
+                    title: '是否通过好友请求?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '通过!',
+                    cancelButtonText: '拒绝',
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    buttonsStyling: true
+                }).then(function(isConfirm) {
+                    if (isConfirm.value === true) {
+                        axios.post('user/saveFriendRequest',{'friendId':friendId})
+							.then(function (response) {
+                                if(response.data.status==200){
+                                    swal('已经成功添加好友','','success');
+                                    return;
+                                }
+                                swal('系统出错了','','error');
+							})
+							.catch(function (reason) {
+                            	swal('系统出错了','','error');
+							})
+                    } else if (isConfirm.dismiss === "cancel") {
+                        axios.post('user/refuseFriendRequest',{'friendId':friendId})
+                            .then(function (response) {
+                                if(response.data.status==200){
+                                    swal('拒绝成功','','success');
+                                    return;
+                                }
+                                swal('系统出错了','','error');
+                            })
+                            .catch(function (reason) {
+                                swal('系统出错了','','error');
+                            })
+                    } else {
+                    }
+                })
 			},
 			//保存用户请求
             addh_submit:function(){

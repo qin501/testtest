@@ -50,4 +50,10 @@ public interface UserService {
     JSONResult saveUserRequest(String id, String userId);
 
     JSONResult updateNickname(String id, String nickname);
+
+    JSONResult getNewFriendList(User userLogin);
+
+    JSONResult saveFriendRequest(String id, String friendId);
+
+    JSONResult refuseFriendRequest(String id, String friendId);
 }

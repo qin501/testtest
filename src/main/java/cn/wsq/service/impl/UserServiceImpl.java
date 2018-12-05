@@ -246,4 +246,58 @@ public class UserServiceImpl implements UserService {
 
         return JSONResult.ok("修改成功");
     }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public JSONResult getNewFriendList(User userLogin) {
+        List<User> userList =friendrequestMapper.selectByUserId(userLogin.getId());
+        if(userList==null)return JSONResult.ok(new ArrayList<User>());
+        for(User u:userList){
+            u.setPassword("");
+        }
+        return JSONResult.ok(userList);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public JSONResult saveFriendRequest(String id, String friendId) {
+        if(!StringUtils.isNotBlank(friendId))return JSONResult.errorMsg("参数有误");
+        Friendrequest friendrequest=new Friendrequest();
+        friendrequest.setSendId(friendId);
+        friendrequest.setAcceptId(id);
+        List<Friendrequest> friendrequests = friendrequestMapper.queryByEntity(friendrequest);
+        if(friendrequests==null||friendrequests.size()==0)return JSONResult.errorMsg("系统错误了");
+        //最终要删除的好友请求
+        Friendrequest ff = friendrequests.get(0);
+        friendrequestMapper.deleteFriendrequest(ff.getId());
+        //添加到好友表里
+        Friends friends=new Friends();
+        friends.setId(IDUtils.getId());
+        friends.setFriendId(friendId);
+        friends.setUserId(id);
+        friends.setAlias(friendId);
+        friendsMapper.addFriends(friends);
+        Friends f1=new Friends();
+        f1.setId(IDUtils.getId());
+        f1.setFriendId(id);
+        f1.setUserId(friendId);
+        f1.setAlias(id);
+        friendsMapper.addFriends(f1);
+        return JSONResult.ok("添加成功");
+    }
+
+    @Override
+    public JSONResult refuseFriendRequest(String id, String friendId) {
+        if(!StringUtils.isNotBlank(friendId))return JSONResult.errorMsg("参数有误");
+        Friendrequest friendrequest=new Friendrequest();
+        friendrequest.setSendId(friendId);
+        friendrequest.setAcceptId(id);
+        List<Friendrequest> friendrequests = friendrequestMapper.queryByEntity(friendrequest);
+        if(friendrequests==null||friendrequests.size()==0)return JSONResult.errorMsg("系统错误了");
+        //最终要删除的好友请求
+        Friendrequest ff = friendrequests.get(0);
+        friendrequestMapper.deleteFriendrequest(ff.getId());
+        return JSONResult.ok("拒绝成功");
+    }
+
 }

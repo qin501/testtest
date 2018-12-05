@@ -109,5 +109,14 @@
 
         </where>
     </select>
+    
+    <select id="selectByUserId" parameterType="String" resultType="user">
+        SELECT user.*
+        FROM
+            friendrequest
+            LEFT JOIN user ON friendrequest.sendId = user.id
+        WHERE
+            friendrequest.acceptId = #{value}
+    </select>
 
 </mapper>
