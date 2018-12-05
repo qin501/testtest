@@ -39,6 +39,48 @@ public class UserController {
         JSONResult result=userService.userRegitser(user);
         return result;
     }
+    /*
+    * 查找用户
+    * */
+    @RequestMapping("frientRequest")
+    public JSONResult frientRequest(@RequestBody User user,HttpServletRequest request){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        user.setId(userLogin.getId());
+        JSONResult result=userService.frientRequest(user);
+        return result;
+    }
+    /*
+    * 保存添加好友请求
+    * */
+    @RequestMapping("saveUserRequest")
+    public JSONResult saveUserRequest(HttpServletRequest request,@RequestBody Friends friends){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        JSONResult result= userService.saveUserRequest(userLogin.getId(),friends.getUserId());
+        return result;
+    }
+    /*
+    * 修改昵称
+    * */
+    @RequestMapping("UpdateNickname")
+    public JSONResult updateNickname(HttpServletRequest request,@RequestBody User user){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        JSONResult result= userService.updateNickname(userLogin.getId(),user.getNickname());
+        if(result.getStatus()==200){
+            userLogin.setNickname(user.getNickname());
+            result.setData(userLogin);
+        }
+        return result;
+
+    }
 
     public JSONResult getFriendList(HttpServletRequest request){
         User userLogin = (User) request.getSession().getAttribute("userLogin");

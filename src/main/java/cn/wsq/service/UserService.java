@@ -44,4 +44,10 @@ public interface UserService {
     List<Friends> getFriendList(String id);
 
     JSONResult userRegitser(User user);
+
+    JSONResult frientRequest(User user);
+
+    JSONResult saveUserRequest(String id, String userId);
+
+    JSONResult updateNickname(String id, String nickname);
 }

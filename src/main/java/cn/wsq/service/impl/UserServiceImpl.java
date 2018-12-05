@@ -3,8 +3,10 @@ package cn.wsq.service.impl;
 import cn.wsq.common.Result;
 import cn.wsq.common.TableResult;
 import cn.wsq.common.TrimSpace;
+import cn.wsq.entity.Friendrequest;
 import cn.wsq.entity.Friends;
 import cn.wsq.entity.User;
+import cn.wsq.mapper.FriendrequestMapper;
 import cn.wsq.mapper.FriendsMapper;
 import cn.wsq.mapper.UserMapper;
 import cn.wsq.service.UserService;
@@ -27,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private FriendsMapper friendsMapper;
+    @Autowired
+    private FriendrequestMapper friendrequestMapper;
 
     /*
     * offset从第几条开始
@@ -175,5 +179,71 @@ public class UserServiceImpl implements UserService {
         }else {
             return JSONResult.errorMsg("传入的参数有误");
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public JSONResult frientRequest(User user) {
+        if(user==null||!StringUtils.isNotBlank(user.getUsername()))return JSONResult.errorMsg("传入的参数有误");
+        User uu=new User();
+        uu.setUsername(user.getUsername());
+        List<User> users = userMapper.queryByEntity(uu);
+        //没有找到
+        if(users==null||users.size()==0){
+            return JSONResult.errorMsg("没有找到此用户");
+        }
+        User u=users.get(0);
+        //查找的是自己
+        if(user.getId().equals(u.getId())){
+            return JSONResult.errorMsg("不能添加自己为好友");
+        }
+        Friends friends=new Friends();
+        friends.setUserId(user.getId());
+        friends.setFriendId(u.getId());
+        //如果此好友已经存在
+        List<Friends> friendsList = friendsMapper.queryByEntity(friends);
+        if(friendsList!=null&&friendsList.size()>0){
+            return JSONResult.errorMsg("此好友已存在");
+        }
+       Friendrequest friendrequest = new Friendrequest();
+        friendrequest.setSendId(user.getId());
+        friendrequest.setAcceptId(u.getId());
+        //查询是否好友请求表有此条记录
+        List<Friendrequest> friendrequests = friendrequestMapper.queryByEntity(friendrequest);
+        if(friendrequests!=null&&friendrequests.size()>0){
+            return JSONResult.errorMsg("正在等待对方的回复");
+        }
+
+        return JSONResult.ok(u);
+    }
+    /*
+    * 保存用户请求
+    * */
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public JSONResult saveUserRequest(String id, String userId) {
+        Friendrequest friendrequest=new Friendrequest();
+        friendrequest.setSendId(id);
+        if(!StringUtils.isNotBlank(userId))return JSONResult.errorMsg("参数有误");
+        friendrequest.setAcceptId(userId);
+        friendrequest.setRequest_data_time(new Date());
+        friendrequest.setId(IDUtils.getId());
+        friendrequestMapper.addFriendrequest(friendrequest);
+
+        return JSONResult.ok("已添加到数据库请求表中");
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public JSONResult updateNickname(String id, String nickname) {
+        if(!StringUtils.isNotBlank(nickname)){
+            return JSONResult.errorMsg("参数有误");
+        }
+        User user = new User();
+        user.setNickname(nickname);
+        user.setId(id);
+        userMapper.updateUser(user);
+
+        return JSONResult.ok("修改成功");
     }
 }

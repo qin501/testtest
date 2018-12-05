@@ -90,8 +90,8 @@
                     swal('密码为6-15个字符','','warning');
                     return;
                 }
-                if(this.nickname.length<3||this.nickname.length>8){
-                    swal('昵称为3-8个字符','','warning');
+                if(this.nickname.length<1||this.nickname.length>15){
+                    swal('昵称为1-15个字符','','warning');
                     return;
                 }
                 axios.post('user/register',{'username':this.username,'password':this.password,'nickname':this.nickname})
