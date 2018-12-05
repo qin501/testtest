@@ -20,17 +20,17 @@
 </head>
 <body>
 <div class="box">
-	<div class="wechat">
+	<div class="wechat" id="webchat">
 		
 		<div class="sidestrip">
-			<div class="am-dropdown" data-am-dropdown>
+			<div class="am-dropdown" data-am-dropdown id="topicon">
 				<!--头像插件-->
 				<div class="own_head am-dropdown-toggle"></div>
 				<div class="am-dropdown-content">
 					<div class="own_head_top">
 						<div class="own_head_top_text">
-							<p class="own_name">彭于晏丶plus<img src="images/icon/head.png" alt="" /></p>
-							<p class="own_numb">微信号：123456</p>
+							<p class="own_name">{{userInfo.nickname}}<img src="images/icon/head.png" alt="" /></p>
+							<p class="own_numb">微信号：{{userInfo.username}}</p>
 						</div>
 						<img src="images/own_head.jpg" alt="" />
 					</div>
@@ -151,97 +151,6 @@
 				</div>
 			</div>
 		</div>
-		<script>
-			var chatmodal=new Vue({
-				el:'#chat-modal-6',
-				data:{
-                    innerHtml:'',
-					userId:''
-				},
-				methods:{
-                    addh_submit:function(){
-                        axios.post('user/saveUserRequest',{'userId':this.userId})
-							.then(function (response) {
-							    if(response.data.status==200){
-                                    swal('已经发送成功','','success');
-                                    return;
-								}
-                                swal('系统出错了','','error');
-							})
-							.catch(function (reason) {
-							    swal('系统出错了','','error');
-							})
-					},
-                    addh_cancel:function () {
-                        innerHtml='';
-                    }
-				}
-			});
-            var downjustify=new Vue({
-                el:'#downjustify',
-                data:{
-                    requestusername:'',//请求的好友username
-                    txt_newname:''//新的别名
-                },
-                methods:{
-                    //添加好友
-                    addsubmit:function () {
-                        if(this.requestusername.length==0){
-                            swal('请输入查找的用户','','warning')
-                            return;
-                        }
-                        axios.post('user/frientRequest',{'username':this.requestusername})
-							.then(function (response) {
-							    var user=response.data.data;
-								if(response.data.status==200){
-								    console.log(user);
-                                    chatmodal.userId=user.id;
-                                    chatmodal.innerHtml=' <div class="user_head"> <img src="'+ user.faceicon +'"/></div> ' +
-                                        ' <div class="user_text"> ' +
-                                        ' <p class="user_name"> 昵称： ' + user.nickname +' </p> ' +
-                                        ' <p class="user_message">用户名：  ' +  user.username +'</p> ' +
-                                        ' </div> ';
-                                    $('#chat-modal-6').modal();
-								}else{
-								    swal(response.data.msg,'','warning')
-								}
-							})
-							.catch(function (reason) {
-							    swal('系统出错','','error')
-							})
-                    },//关闭好友添加窗口
-                    addcancel:function () {
-                        this.requestusername='';
-                    },//昵称修改
-                    nick_submit:function(){
-						if(this.txt_newname.length<1||this.txt_newname.length>15){
-                            swal('昵称为1-15个字符','','warning');
-                            return;
-						}
-                        axios.post('user/UpdateNickname',{'nickname':this.txt_newname})
-							.then(function (response) {
-							    if(response.data.status==200){
-                                    swal('修改成功','','success');
-                                    this.txt_newname='';
-                                    return;
-								}
-                                swal('系统出错','','error');
-							})
-							.catch(function (error) {
-                                swal('系统出错','','error');
-							})
-
-                    },
-                    nick_cancel:function () {
-                       this.txt_newname='';
-                    },//用户退出
-                    exit_submit:function () {
-                        axios.get('logout');
-                        location.href='loginPage'
-                    }
-                }
-            })
-		</script>
 		
 		<!--聊天列表-->
 		<div class="middle on">
@@ -525,8 +434,113 @@
 	</div>
 </div>
 
+<script>
+    var chatmodal=new Vue({
+        el:'#webchat',
+        data:{
+            userInfo:{},
+            innerHtml:'',//请求好友信息的html
+            userId:'',//请求好友的id
+            requestusername:'',//请求的好友username
+            txt_newname:''//新的别名
+        },
+        mounted:function(){
+            this.getUserGlobal();
+          /*  if(this.userInfo==null||this.userInfo.id==null||typeof (this.userInfo.id)=='undefined'){
+                swal('用户没有登录','','error')
+                location.href='loginPage';
+			}*/
 
-<script type="text/javascript" src="js/jquery.min.js"></script>
+		},
+        methods:{
+            //获取全局的用户信息
+            getUserGlobal:function(){
+               return this.userInfo=JSON.parse(localStorage.getItem("userInfo"));
+			},
+			//设置全局的用户信息
+			setUserGlobal:function(data){
+                var str=JSON.stringify(data);
+				localStorage.setItem("userInfo",str);
+				this.userInfo=data;
+			},
+			//保存用户请求
+            addh_submit:function(){
+                axios.post('user/saveUserRequest',{'userId':this.userId})
+                    .then(function (response) {
+                        if(response.data.status==200){
+                            swal('已经发送成功','','success');
+                            return;
+                        }
+                        swal('系统出错了','','error');
+                    })
+                    .catch(function (reason) {
+                        swal('系统出错了','','error');
+                    })
+            },//关闭按钮
+            addh_cancel:function () {
+                innerHtml='';
+            },
+            //添加好友
+            addsubmit:function () {
+                if(this.requestusername.length==0){
+                    swal('请输入查找的用户','','warning')
+                    return;
+                }
+                axios.post('user/frientRequest',{'username':this.requestusername})
+                    .then(function (response) {
+                        var user=response.data.data;
+                        if(response.data.status==200){
+                            console.log(user);
+                            chatmodal.userId=user.id;
+                            chatmodal.innerHtml=' <div class="user_head"> <img src="'+ user.faceicon +'"/></div> ' +
+                                ' <div class="user_text"> ' +
+                                ' <p class="user_name"> 昵称： ' + user.nickname +' </p> ' +
+                                ' <p class="user_message">用户名：  ' +  user.username +'</p> ' +
+                                ' </div> ';
+                            $('#chat-modal-6').modal();
+                        }else{
+                            swal(response.data.msg,'','warning')
+                        }
+                    })
+                    .catch(function (reason) {
+                        swal('系统出错','','error')
+                    })
+            },//关闭好友添加窗口
+            addcancel:function () {
+                this.requestusername='';
+            },//昵称修改
+            nick_submit:function(){
+                if(this.txt_newname.length<1||this.txt_newname.length>15){
+                    swal('昵称为1-15个字符','','warning');
+                    return;
+                }
+                axios.post('user/UpdateNickname',{'nickname':this.txt_newname})
+                    .then(function (response) {
+                        if(response.data.status==200){
+                            swal('修改成功','','success');
+                            this.txt_newname='';
+                            chatmodal.setUserGlobal(response.data.data);
+                            return;
+                        }
+                        swal('系统出错','','error');
+                    })
+                    .catch(function (error) {
+                        swal('系统出错','','error');
+                    })
+
+            },//取消按钮
+            nick_cancel:function () {
+                this.txt_newname='';
+            },//用户退出
+            exit_submit:function () {
+                axios.get('logout');
+                localStorage.clear();
+                location.href='loginPage'
+            }
+        }
+    });
+</script>
+<!--<script type="text/javascript" src="js/jquery.min.js"></script>-->
 <script type="text/javascript" src="js/amazeui.min.js"></script>
 <script type="text/javascript" src="js/zUI.js"></script>
 <script type="text/javascript" src="js/wechat.js"></script>
@@ -575,61 +589,5 @@ window.onload=function(){
 	b();
 };
 </script>
-
-<script>
-/*
-* 					<li>
-  						<p>A</p>
-  						<div class="friends_box">
-  							<div class="user_head"><img src="images/head/3.jpg"/></div>
-  							<div class="friends_text">
-  								<p class="user_name">彭于晏丶plus</p>
-  							</div>
-  						</div>
-  					</li>
-* */
-/*
-* 聊天列表
-* */
-    Vue.component('friendListComponent',{
-        props:['postfriendList'],
-        template:
-         '<li>\n'+
-          '<p>A</p>\n'+
-          '<div class="friends_box">\n'+
-          '<div class="user_head"><img src="images/head/3.jpg"/></div>\n'+
-          '<div class="friends_text">\n'+
-          '<p class="user_name">彭于晏丶plus</p>\n'+
-          '</div>\n'+
-          '</div>\n'+
-          '</li>'
-    })
-    new Vue({
-        el:'#friendList',
-        data:{
-            friendList:[]
-        },
-        methods:{
-          aa:function() {
-           // alert('aa');
-          }
-        },
-        mounted:function() {
-            this.aa();
-         // alert(111);
-        },
-        created:function() {
-            this.aa();
-          //alert(222);
-        }
-    });
-
-
-</script>
-
-
-
-
-
 </body>
 </html>

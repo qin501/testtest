@@ -77,6 +77,9 @@
                 axios.post('user/login',requestData)
                     .then(function (response) {
                         if(response.data.status==200){
+                            var json=JSON.stringify(response.data.data);
+                            localStorage.setItem("userInfo",json);
+                            console.log(response.data.data);
                             location.href='index.html';
                         }else{
                             swal(response.data.msg,'','error');
