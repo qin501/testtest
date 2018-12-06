@@ -2,6 +2,7 @@ package cn.wsq.nettyServer;
 
 import cn.wsq.SpringUtil;
 import cn.wsq.service.UserService;
+import cn.wsq.util.JsonUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -9,6 +10,7 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg)
             throws Exception {
-        /*String content = msg.text();
+        String content = msg.text();
         Channel currentChannel = ctx.channel();
         // 获取客户端发来的消息
         DataContent dataContent = JsonUtils.jsonToPojo(content, DataContent.class);
@@ -44,7 +46,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
                         new TextWebSocketFrame(
                                 JsonUtils.objectToJson(data)));
             }
-
             //把最新的channel和userid关联起来
             UserChannelRel.put(senderId, currentChannel);
             System.out.println("把最新的channel和userid关联起来:  "+senderId + currentChannel );
@@ -61,10 +62,8 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             UserService userService = (UserService) SpringUtil.getBean("userServiceImpl");
             String msgId = userService.saveMsg(chatMsg);
             chatMsg.setMsgId(msgId);
-
             DataContent dataContentMsg = new DataContent();
             dataContentMsg.setChatMsg(chatMsg);
-
             // 发送消息
             // 从全局用户Channel关系中获取接受方的channel
             Channel receiverChannel = UserChannelRel.get(receiverId);
@@ -98,15 +97,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 
             if (msgIdList != null && !msgIdList.isEmpty() && msgIdList.size() > 0) {
                 // 批量签收
-                userService.updateMsgSigned(msgIdList);
+               // userService.updateMsgSigned(msgIdList);
             }
         //客户端保持心跳
         } else if (action == MsgActionEnum.KEEPALIVE.type) {
             // 心跳类型的消息
-//            log.info("收到来自channel为[" + currentChannel + "]的心跳包...");
             System.out.println("收到来自channel为[" + currentChannel + "]的心跳包...");
         }
-*/
+
     }
 
     /**
@@ -121,7 +119,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         String channelId = ctx.channel().id().asShortText();
-//        log.info("客户端被移除，channelId为：" + channelId);
         System.out.println("客户端被移除，channelId为：" + channelId);
         //当触发handlerRemoved channelGroup会自动移除对应客户端的channel
         users.remove(ctx.channel());

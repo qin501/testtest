@@ -5,10 +5,14 @@ import cn.wsq.common.TableResult;
 import cn.wsq.common.TrimSpace;
 import cn.wsq.entity.Friendrequest;
 import cn.wsq.entity.Friends;
+import cn.wsq.entity.Msg;
 import cn.wsq.entity.User;
 import cn.wsq.mapper.FriendrequestMapper;
 import cn.wsq.mapper.FriendsMapper;
+import cn.wsq.mapper.MsgMapper;
 import cn.wsq.mapper.UserMapper;
+import cn.wsq.nettyServer.ChatMsg;
+import cn.wsq.service.MsgService;
 import cn.wsq.service.UserService;
 import cn.wsq.util.IDUtils;
 import cn.wsq.util.JSONResult;
@@ -31,6 +35,8 @@ public class UserServiceImpl implements UserService {
     private FriendsMapper friendsMapper;
     @Autowired
     private FriendrequestMapper friendrequestMapper;
+    @Autowired
+    private MsgMapper msgMapper;
 
     /*
     * offset从第几条开始
@@ -307,6 +313,34 @@ public class UserServiceImpl implements UserService {
         Friendrequest ff = friendrequests.get(0);
         friendrequestMapper.deleteFriendrequest(ff.getId());
         return JSONResult.ok("拒绝成功");
+    }
+    /*
+    * 保存聊天记录在数据库
+    * */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public String saveMsg(ChatMsg chatMsg) {
+        Msg msg = new Msg();
+        msg.setSendId(chatMsg.getSenderId());
+        msg.setAcceptId(chatMsg.getReceiverId());
+        msg.setSignFlag(1);
+        msg.setMsg(chatMsg.getMsg());
+        String id=IDUtils.getId();
+        msg.setId(id);
+        msg.setCreateTime(new Date());
+        msgMapper.addMsg(msg);
+        return id;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public JSONResult getUnReadMessage(String id) {
+        Msg msg = new Msg();
+        msg.setSendId(id);
+        msg.setSignFlag(1);
+        List<Msg> msgs = msgMapper.queryByEntity(msg);
+        JSONResult result=JSONResult.ok(msgs);
+        return result;
     }
 
 }

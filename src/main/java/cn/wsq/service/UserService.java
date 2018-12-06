@@ -4,6 +4,7 @@ import cn.wsq.common.Result;
 import cn.wsq.common.TableResult;
 import cn.wsq.entity.Friends;
 import cn.wsq.entity.User;
+import cn.wsq.nettyServer.ChatMsg;
 import cn.wsq.util.JSONResult;
 
 import java.util.List;
@@ -56,4 +57,8 @@ public interface UserService {
     JSONResult saveFriendRequest(String id, String friendId);
 
     JSONResult refuseFriendRequest(String id, String friendId);
+
+    String saveMsg(ChatMsg chatMsg);
+
+    JSONResult getUnReadMessage(String id);
 }

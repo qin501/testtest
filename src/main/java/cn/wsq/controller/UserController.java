@@ -128,5 +128,17 @@ public class UserController {
         JSONResult result= userService.getFriendList(userLogin.getId());
         return result;
     }
+    /*
+    *
+    * */
+    @RequestMapping("getUnReadMessage")
+    public JSONResult getUnReadMessage(HttpServletRequest request){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        JSONResult result= userService.getUnReadMessage(userLogin.getId());
+        return result;
+    }
 
 }
