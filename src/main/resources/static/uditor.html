@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" charset="utf-8" src="ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="./ueditor.all.min.js"> </script>
+    <script type="text/javascript" src="js/zh-cn.js"></script>
+</head>
+<body>
+
+<div id="ueditor"></div>
+<script>
+    UE.getEditor('ueditor', {
+        autoHeightEnabled: false,
+        initialFrameHeight: 60,
+        initialFrameWidth: 550,
+        elementPathEnabled: false,
+        wordCount: true,
+        maximumWords:100,
+        toolbars: [[
+            'source','undo','redo','emotion','simpleupload','map','insertvideo'
+        ]]
+    });
+</script>
+</body>
+</html>
