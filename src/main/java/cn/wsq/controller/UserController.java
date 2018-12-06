@@ -116,14 +116,17 @@ public class UserController {
         JSONResult result= userService.refuseFriendRequest(userLogin.getId(),friendId.getFriendId());
         return result;
     }
-
+    /*
+    * 获取朋友列表
+    * */
+    @RequestMapping("getfriendList")
     public JSONResult getFriendList(HttpServletRequest request){
         User userLogin = (User) request.getSession().getAttribute("userLogin");
         if(userLogin==null){
             return JSONResult.errorMsg("用户没有登录");
         }
-        List<Friends> list=userService.getFriendList(userLogin.getId());
-        return null;
+        JSONResult result= userService.getFriendList(userLogin.getId());
+        return result;
     }
 
 }

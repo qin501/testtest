@@ -148,10 +148,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Friends> getFriendList(String id) {
-        
-        return null;
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public JSONResult getFriendList(String id) {
+        List<User> list=friendsMapper.queryByUserId(id);
+        if(list!=null&&list.size()!=0){
+
+            return JSONResult.ok(list);
+        }
+        return JSONResult.ok(new ArrayList<User>());
     }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public JSONResult userRegitser(User user) {
@@ -275,18 +281,21 @@ public class UserServiceImpl implements UserService {
         friends.setId(IDUtils.getId());
         friends.setFriendId(friendId);
         friends.setUserId(id);
-        friends.setAlias(friendId);
+        User friendById = userMapper.getUserById(friendId);
+        friends.setAlias(friendById.getNickname());
         friendsMapper.addFriends(friends);
         Friends f1=new Friends();
         f1.setId(IDUtils.getId());
         f1.setFriendId(id);
         f1.setUserId(friendId);
-        f1.setAlias(id);
+        User userById = userMapper.getUserById(id);
+        f1.setAlias(userById.getNickname());
         friendsMapper.addFriends(f1);
         return JSONResult.ok("添加成功");
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public JSONResult refuseFriendRequest(String id, String friendId) {
         if(!StringUtils.isNotBlank(friendId))return JSONResult.errorMsg("参数有误");
         Friendrequest friendrequest=new Friendrequest();

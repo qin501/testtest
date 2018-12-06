@@ -1,6 +1,7 @@
 package cn.wsq.mapper;
 
 import cn.wsq.entity.Friends;
+import cn.wsq.entity.User;
 
 import java.util.List;
 
@@ -31,4 +32,6 @@ public interface FriendsMapper {
     public Friends getFriendsById(String id);
     //精确查询
     public List<Friends> queryByEntity(Friends friends);
+
+    List<User> queryByUserId(String id);
 }

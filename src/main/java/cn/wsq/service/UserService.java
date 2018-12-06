@@ -41,7 +41,7 @@ public interface UserService {
 
     public JSONResult login(User user);
 
-    List<Friends> getFriendList(String id);
+    JSONResult getFriendList(String id);
 
     JSONResult userRegitser(User user);
 
