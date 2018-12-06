@@ -35,7 +35,7 @@ window.onload=function b(){
 	var btn = document.getElementById('send');
 	var talk = document.getElementById('talkbox');
 	
-	btn.onclick=function(){
+	/*btn.onclick=function(){
 		if(text.value ==''){
             alert('不能发送空消息');
         }else{
@@ -45,7 +45,7 @@ window.onload=function b(){
 			talk.style.background="#fff";
 			text.style.background="#fff";
 		};
-	};
+	};*/
 };
 
 

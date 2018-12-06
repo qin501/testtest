@@ -16,11 +16,15 @@
     <script src="./js/axios.min.js"></script>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script src="js/pinyin.js"></script>
+	<script type="text/javascript" charset="utf-8" src="ueditor.config.js"></script>
+	<script type="text/javascript" charset="utf-8" src="./ueditor.all.min.js"> </script>
+	<script type="text/javascript" src="js/zh-cn.js"></script>
 
 </head>
 <body>
 <div class="box">
-	<div class="wechat" id="webchat">
+	<div class="wechat" id="webchat" style="background:#f5f5f5">
 		
 		<div class="sidestrip">
 			<div class="am-dropdown" data-am-dropdown id="topicon">
@@ -35,7 +39,7 @@
 						<img src="images/own_head.jpg" alt="" />
 					</div>
 					<div class="own_head_bottom">
-						<p><span>地区</span>江西 九江</p>
+						<p><span>地区</span>北京 天安门广场</p>
 						<div class="own_head_bottom_img">
 							<a href=""><img src="images/icon/head_1.png"/></a>
 							<a href=""><img src="images/icon/head_2.png"/></a>
@@ -278,66 +282,19 @@
 						</div>
 					</li>
 					<li>
-						<p>A</p>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/3.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">彭于晏丶plus</p>
-							</div>
-						</div>
+						<p>好友列表</p>
 					</li>
 
-					<li>
-						<p>B</p>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/6.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">苏笑言</p>
+					<li v-for="(friendList,index) in friendListArray" v-if="friendList.length>0">
+							<p>{{enWords[index]}}</p>
+							<div class="friends_box" v-for="friend in friendList" @click="chatFriend(friend.id)">
+								<div class="user_head"><img v-bind:src="friend.faceicon"/></div>
+								<div class="friends_text">
+									<p class="user_name">{{friend.nickname}}</p>
+								</div>
 							</div>
-						</div>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/7.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">往事不再提</p>
-							</div>
-						</div>
 					</li>
-					<li>
-						<p>C</p>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/8.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">夏继涛</p>
-							</div>
-						</div>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/9.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">早安无恙</p>
-							</div>
-						</div>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/10.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">王鹏</p>
-							</div>
-						</div>
-					</li>
-					<li>
-						<p>D</p>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/11.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">涨了潮了</p>
-							</div>
-						</div>
-						<div class="friends_box">
-							<div class="user_head"><img src="images/head/12.jpg"/></div>
-							<div class="friends_text">
-								<p class="user_name">Ktz丶中融资</p>
-							</div>
-						</div>
-					</li>
+
 				</ul>
 			</div>	
 		</div>
@@ -383,30 +340,14 @@
 		</div>
 	
 		<!--聊天窗口-->
-		<div class="talk_window">
+		<div class="talk_window" v-if="chatWindow.id!=null && chatWindow.id!=undefined">
 			<div class="windows_top">
 				<div class="windows_top_box">
-					<span>早安无恙</span>
-					<ul class="window_icon">
-						<li><a href=""><img src="images/icon/icon7.png"/></a></li>
-						<li><a href=""><img src="images/icon/icon8.png"/></a></li>
-						<li><a href=""><img src="images/icon/icon9.png"/></a></li>
-						<li><a href=""><img src="images/icon/icon10.png"/></a></li>
-					</ul>
-					<div class="extend" class="am-btn am-btn-success" data-am-offcanvas="{target: '#doc-oc-demo3'}"></div>
-					<!-- 侧边栏内容 -->
-					<div id="doc-oc-demo3" class="am-offcanvas">
-						<div class="am-offcanvas-bar am-offcanvas-bar-flip">
-							<div class="am-offcanvas-content">
-								<p><a href="http://music.163.com/#/song?id=385554" target="_blank">网易音乐</a></p>
-							</div>
-						</div>
-					</div>
+					<span>{{chatWindow.nickname}}</span>
 				</div>
 			</div>
-			
 			<!--聊天内容-->
-			<div class="windows_body">
+				<div class="windows_body">
 				<div class="office_text" style="height: 100%;">
 					<ul class="content" id="chatbox">
 						<li class="me"><img src="images/own_head.jpg" title="金少凯"><span>疾风知劲草，板荡识诚臣</span></li>
@@ -416,21 +357,15 @@
 			</div>
 			
 			<div class="windows_input" id="talkbox">
-				<div class="input_icon">
-					<a href="javascript:;"></a>
-					<a href="javascript:;"></a>
-					<a href="javascript:;"></a>
-					<a href="javascript:;"></a>
-					<a href="javascript:;"></a>
-					<a href="javascript:;"></a>
-				</div>
 				<div class="input_box">
-					<textarea name="" rows="" cols="" id="input_box"></textarea>
-					<button id="send">发送（S）</button>
+					<textarea name="" rows="" cols="" id="input_box_"></textarea>
+					<button id="send" v-on:click="sendMsg(chatWindow.id)">发送（S）</button>
 				</div>
+
 			</div>
 		</div>
 	</div>
+
 </div>
 
 <script>
@@ -442,7 +377,21 @@
             innerHtml:'',//请求好友信息的html
             userId:'',//请求好友的id
             requestusername:'',//请求的好友username
-            txt_newname:''//新的别名
+            txt_newname:'',//新的别名
+			friendList:[],//朋友列表
+            friendListArray : [
+                [],[],[],[],[],[],[],[],[],
+                [],[],[],[],[],[],[],[],[],
+                [],[],[],[],[],[],[],[],[]
+            ],
+            enWords : [
+                'A', 'B', 'C', 'D', 'E', 'F', 'G',
+                'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z',
+                '#'
+            ],
+			chatWindow:{}
         },
         mounted:function(){
             this.getUserGlobal();
@@ -452,9 +401,41 @@
 			}*/
           //获取好友请求表
           	this.getNewFriendList();
-
+          	//获取好友列表
+          	this.getFriendList();
 		},
         methods:{
+            sendMsg:function(friendId){
+                var UU=UE.getEditor("input_box_");
+                var text=UU.getContent();
+				alert(text);
+                UU.setContent('');
+			},
+            //点击好友列表时触发的事件
+            chatFriend:function(data){
+              var oldChatWindow=this.chatWindow;
+              for(var a=0;a<this.friendList.length;a++){
+                  if(this.friendList[a].id==data){
+                      this.chatWindow=this.friendList[a];
+				  }
+			  }
+			  var aa=this.chatWindow;
+			  setTimeout(function(){
+					  UE.getEditor('input_box_', {
+						  autoHeightEnabled: false,
+						  initialFrameHeight: 60,
+						  initialFrameWidth: 550,
+						  elementPathEnabled: false,
+						  wordCount: false,
+						  maximumWords:100,
+						  toolbars: [[
+							  'source','undo','redo','emotion','simpleupload','map','insertvideo'
+						  ]]
+					  }
+                  );
+			  },1);
+
+			},
             //获取全局的用户信息
             getUserGlobal:function(){
                return this.userInfo=JSON.parse(localStorage.getItem("userInfo"));
@@ -479,6 +460,52 @@
 					.catch(function (reason) {
                         swal('系统出错了','','error');
 				})
+			},
+            isNotNull: function(str) {
+                if (str != null && str != "" && str != undefined) {
+                    return true;
+                }
+                return false;
+            },
+			//获取朋友列表
+			getFriendList(){
+                // 构建通讯录二维数组模型
+                    this.friendListArray = [
+                        [],[],[],[],[],[],[],[],[],
+                        [],[],[],[],[],[],[],[],[],
+                        [],[],[],[],[],[],[],[],[]
+                    ];
+                axios.get('user/getfriendList')
+                    .then(function (response) {
+                        if(response.data.status==200){
+                            if(response.data.data!=null&&response.data.data!=""&&response.data.data!=undefined){
+                                chatmodal.friendList=response.data.data;
+                            }else{
+                                chatmodal.friendList=[];
+							}
+							//getPinYinFirstCharacter(input.value, "-", true).split('')[0];
+							for(var a=0;a<chatmodal.friendList.length;a++){
+							    //获取拼音大写
+							    var pingying=getPinYinFirstCharacter(chatmodal.friendList[a].nickname, "-", true).split('')[0];
+							    //拼音在二维数组中的值
+							    var order=chatmodal.enWords.length-1;
+							    for(var b=0;b<chatmodal.enWords.length;b++){
+									if(chatmodal.enWords[b]==pingying){
+									    order=b;
+									    break;
+									}
+								}
+                                chatmodal.friendListArray[order].push(chatmodal.friendList[a]);
+							}
+                            return;
+                        }
+                        swal('系统出错了','','error');
+
+                    })
+                    .catch(function (reason) {
+                        swal('系统出错了','','error');
+                    });
+
 			},
 			//同意好友请求
             permissionFriend:function(friendId){
@@ -632,7 +659,7 @@ window.onload=function(){
 		var chat = document.getElementById('chatbox');
 		var btn = document.getElementById('send');
 		var talk = document.getElementById('talkbox');
-		btn.onclick=function(){
+/*		btn.onclick=function(){
 			if(text.value ==''){
 				alert('不能发送空消息');
 			}else{
@@ -642,7 +669,7 @@ window.onload=function(){
 				talk.style.background="#fff";
 				text.style.background="#fff";
 			};
-		};
+		};*/
 	};
 	a();
 	b();

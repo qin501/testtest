@@ -109,5 +109,14 @@
 
         </where>
     </select>
+    
+    <select id="queryByUserId" resultType="user" parameterType="String">
+        select
+	user.id,user.username,user.faceicon,friends.alias nickname
+    from
+        friends left join user on user.id=friends.friendId
+    where
+    friends.userId=#{value}
+    </select>
 
 </mapper>

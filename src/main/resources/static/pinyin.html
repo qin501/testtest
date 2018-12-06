@@ -25,7 +25,7 @@
     result.innerText = getPinYin(input.value);
     firstResult.innerText = getPinYinFirstCharacter(input.value);
     upperCaseResult.innerText = getPinYin(input.value, "-", true);
-    upperCaseFirstResult.innerText = getPinYinFirstCharacter(input.value, "-", true);
+    upperCaseFirstResult.innerText = getPinYinFirstCharacter(input.value, "-", true).split('')[0];
   })
   // 打开时候执行一次
   btn.click();
