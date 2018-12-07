@@ -78,18 +78,20 @@ window.CHAT={
         chatmodal.saveUserChatHistory(chatMsg.receiverId,chatMsg.senderId,chatMsg.msg,2);
         var unRead=false;
         if(chatmodal.isNotNull(chatmodal.chatWindow.id)){
+            //如果是当前窗口是接收者
             if(chatmodal.chatWindow.id==chatMsg.senderId){
                 var userChatHistory=chatmodal.getUserChatHistory(chatMsg.receiverId,chatMsg.senderId);
+                unRead=true;
                 if(chatmodal.isNotNull(userChatHistory)){
+                    //渲染当前窗口
                     chatmodal.userChatHistoryList=userChatHistory;
                 }
-                unRead=true;
             }
         }
         //保存聊天快照
-        chatmodal.saveUserChatSnapshot(chatMsg.receiverId,chatMsg.senderId,chatMsg,unRead);
-        //var scroll_div = document.getElementById("office_text");
-        //scroll_div.scrollTop = scroll_div.scrollHeight;
+        chatmodal.saveUserChatSnapshot(chatMsg.receiverId,chatMsg.senderId,chatMsg.msg,unRead);
+        var scroll_div = document.getElementById("scroll_div");
+        scroll_div.scrollTop = scroll_div.scrollHeight;
 
     },
     //发送信息
@@ -116,7 +118,7 @@ window.CHAT={
     },
     //快照对象 isRead用于判断是否已读
     chatSnapshot:function (userId,friendId,msg,isRead) {
-        return {userId:userId,friendId:friendId,msg:isRead};
+        return {userId:userId,friendId:friendId,msg:msg,isRead:isRead};
     }
 
 }

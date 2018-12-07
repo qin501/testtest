@@ -1,12 +1,14 @@
 ﻿<!DOCTYPE html>
 <html xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="utf-8">
-<title>聊天室</title>
-<link rel="stylesheet" href="css/amazeui.min.css" />
-<link rel="stylesheet" href="css/main.css" />
-<link rel="stylesheet" href="./css/bootstrap.min.css">
+	<meta charset="utf-8">
+	<title>聊天室</title>
+	<link rel="stylesheet" href="css/amazeui.min.css" />
+	<link rel="stylesheet" href="css/main.css" />
+	<link rel="stylesheet" href="./css/bootstrap.min.css">
 	<link rel="stylesheet" href="./css/sweetalert2.min.css">
+	<link rel="stylesheet" href="./css/ImgCropping.css">
+	<link rel="stylesheet" href="css/cropper.min.css">
     <!-- 开发环境版本，包含了有帮助的命令行警告 -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
    <!--  生产环境版本，优化了尺寸和速度
@@ -21,6 +23,63 @@
 	<script type="text/javascript" charset="utf-8" src="./ueditor.all.min.js"> </script>
 	<script type="text/javascript" src="js/zh-cn.js"></script>
 	<script type="text/javascript" src="js/chat.js"></script>
+	<style>
+		.am-dropdown-content {
+			width: 250px;
+			margin-left: 20px;
+			border: none;
+			border-radius: 4px;
+			box-shadow: 0 0 8px rgba(0,0,0,.1);
+			padding:20px 5px -1px 20px; //上 右 下 左
+		top: 0px;
+			left: 32px;
+		}
+
+		.up-img-cover {
+			width: 100px;
+			height: 100px;
+		}
+
+		.up-img-cover img{
+			width: 100%;
+		}
+
+		.red-point{
+			position: relative;
+		}
+
+		.red-point::before{
+			content: " ";
+			border: 3px solid #C9394A;/*设置红色*/
+			border-radius:5px;/*设置圆角*/
+			position: absolute;
+			z-index: 3000;
+			right: 0%;
+			margin-right: -10px;
+			margin-top: 0px;
+		}
+		#chatbox img{
+			width: 30px;
+			height: 30px;
+		}
+		.user_text video{
+			width: 20px;
+			height: 20px;
+		}
+		.talk_window #talk_window_chat video{
+			width: 120px;
+			height: 120px;
+		}
+		#chatbox li span p{
+			padding: 0px;
+			margin-top: 0px;
+			margin-bottom: 0px;
+		}
+		#user_list.user_list li p img{
+			width: 20px;
+			height: 20px;
+		}
+	</style>
 </head>
 <body>
 <div class="box">
@@ -51,7 +110,7 @@
 			<div class="sidestrip_icon">
 				<a id="si_1" style="background: url(images/icon/head_2_1.png) no-repeat;"></a>
 				<a id="si_2"></a>
-				<a id="si_3"></a>
+				<!--<a id="si_3"></a>-->
 			</div>
 			
 			<!--底部扩展键-->
@@ -163,102 +222,19 @@
 				<button>+</button>
 			</div>
 			<div class="office_text">
-				<ul class="user_list">
-					<li class="user_active">
-						<div class="user_head"><img src="images/head/15.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">早安无恙</p>
-							<p class="user_message">我是傻逼！，金少凯牛逼！</p>
+				<ul class="user_list" id="user_list">
+					<!--(userId,friendId,msg,unRead)-->
+					<li v-for="chatSnapshot in userChatSnapshot" v-bind:class="chatWindow.id==chatSnapshot.friendId?'user_active':''" v-on:click="openChatWindow(chatSnapshot.friendId)">
+						<div v-for="friend in friendList" v-if="friend.id==chatSnapshot.friendId">
+							<div class="user_head">
+								<img v-bind:src="friend.faceicon"/>
+							</div>
+							<div class="user_text">
+								<p class="user_name" >{{friend.nickname}}</p>
+								<p class="user_message" v-html="chatSnapshot.msg"></p>
+							</div>
+							<!--<div class="user_time">昨天</div>-->
 						</div>
-						<div class="user_time">下午 2：54</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/2.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">夏继涛</p>
-							<p class="user_message">[小程序]</p>
-						</div>
-						<div class="user_time">上午 11：03</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/3.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">十里老街秋名山车神车队</p>
-							<p class="user_message">乞讨两块交个话费</p>
-						</div>
-						<div class="user_time">昨天</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/4.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">阿杰</p>
-							<p class="user_message">[动画表情]</p>
-						</div>
-						<div class="user_time">昨天</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/5.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">订阅号</p>
-							<p class="user_message">庐山国际水彩艺术节：</p>
-						</div>
-						<div class="user_time">星期三</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/6.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">小龙网食品</p>
-							<p class="user_message">槟榔的100种吃法</p>
-						</div>
-						<div class="user_time">星期二</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/7.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">文件传输助手</p>
-							<p class="user_message"></p>
-						</div>
-						<div class="user_time">星期二</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/8.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">陈明杰</p>
-							<p class="user_message">妈的，你在聊我</p>
-						</div>
-						<div class="user_time">星期四</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/9.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">妈</p>
-							<p class="user_message">面</p>
-						</div>
-						<div class="user_time">星期四</div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/10.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">土豆</p>
-							<p class="user_message">[图片]</p>
-						</div>
-						<div class="user_time"></div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/11.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">Emmera</p>
-							<p class="user_message"></p>
-						</div>
-						<div class="user_time"></div>
-					</li>
-					<li>
-						<div class="user_head"><img src="images/head/12.jpg"/></div>
-						<div class="user_text">
-							<p class="user_name">彭于晏丶plus</p>
-							<p class="user_message">我送20个都他妈的能赢，这群鬼人真的恐怖</p>
-						</div>
-						<div class="user_time"></div>
 					</li>
 				</ul>
 			</div>	
@@ -300,7 +276,7 @@
 		</div>
 		
 		<!--程序列表-->
-		<div class="middle">
+<!--		<div class="middle">
 			<div class="wx_search">
 				<input type="text" placeholder="搜索收藏内容"/>
 				<button>+</button>
@@ -337,7 +313,7 @@
 					</li>
 				</ul>
 			</div>	
-		</div>
+		</div>-->
 	
 		<!--聊天窗口-->
 		<div class="talk_window" v-if="chatWindow.id!=null && chatWindow.id!=undefined">
@@ -348,7 +324,7 @@
 			</div>
 			<!--聊天内容-->
 				<div class="windows_body">
-				<div class="office_text" style="height: 100%;"><!--{userId:userId,friendId:friendId,msg:msg,flag:flag}-->
+				<div class="office_text" style=" overflow:scroll;  height:492px;" id="scroll_div"><!--{userId:userId,friendId:friendId,msg:msg,flag:flag}-->
 					<ul class="content" id="chatbox" v-for="userChatHistory in userChatHistoryList">
 						<li class="me" v-if="userChatHistory.flag==1">
 							<img src="images/own_head.jpg" title="金少凯">
@@ -415,6 +391,19 @@
           	this.getFriendList();
 		},
         methods:{
+            //从左侧点击联系人，打开窗口
+            openChatWindow:function(data){
+                for(var a=0;a<this.friendList.length;a++){
+                    //改变当前窗口
+                    if(this.friendList[a].id==data){
+                        this.chatWindow=this.friendList[a];
+                    }
+                    var user=this.getUserGlobal();
+                    //当前聊天页面渲染
+                    this.userChatHistoryList=this.getUserChatHistory(user.id,data);
+                }
+
+			},
 			//渲染聊天页面
 			setChatPage:function(friendId){
 
@@ -458,6 +447,7 @@
 				//从头插入
 				chatSnapshotList.unshift(chatSnapshot);
 				localStorage.setItem(chatKey,JSON.stringify(chatSnapshotList));
+				chatmodal.userChatSnapshot=chatSnapshotList;
 			},
 			//保存我和好友的聊天记录 flag1是我发的，2是对方发的
             saveUserChatHistory:function(userId, friendId, msg, flag){
@@ -502,9 +492,10 @@
                 this.saveUserChatHistory(user.id,friendId,text,1);
                 //当前聊天页面渲染
                 this.userChatHistoryList=this.getUserChatHistory(user.id,friendId);
-
-                //var scroll_div = document.getElementById("office_text");
-                //scroll_div.scrollTop = scroll_div.scrollHeight;
+                //保存聊天快照
+                chatmodal.saveUserChatSnapshot(user.id,friendId,text,true);
+                var scroll_div = document.getElementById("scroll_div");
+                scroll_div.scrollTop = scroll_div.scrollHeight;
 
 			},
             //点击好友列表时触发的事件
@@ -535,6 +526,8 @@
 				UUE.ready(function () {
 					UUE.setContent('');
                 })
+                  var scroll_div = document.getElementById("scroll_div");
+                  scroll_div.scrollTop = scroll_div.scrollHeight;
 			  },1);
 			},
             //获取全局的用户信息
@@ -749,28 +742,17 @@ window.onload=function(){
 			si1.style.background="";
 			si3.style.background="";
 		};
-		si3.onclick=function(){
+		/*si3.onclick=function(){
 			si3.style.background="url(images/icon/head_4_1.png) no-repeat"
 			si1.style.background="";
 			si2.style.background="";
-		};
+		};*/
 	};
 	function b(){
 		var text = document.getElementById('input_box');
 		var chat = document.getElementById('chatbox');
 		var btn = document.getElementById('send');
 		var talk = document.getElementById('talkbox');
-/*		btn.onclick=function(){
-			if(text.value ==''){
-				alert('不能发送空消息');
-			}else{
-				chat.innerHTML += '<li class="me"><img src="'+'images/own_head.jpg'+'"><span>'+text.value+'</span></li>';
-				text.value = '';
-				chat.scrollTop=chat.scrollHeight;
-				talk.style.background="#fff";
-				text.style.background="#fff";
-			};
-		};*/
 	};
 	a();
 	b();
@@ -781,5 +763,159 @@ window.onload=function(){
 
 };
 </script>
+
+<!--图片裁剪框 start-->
+<div style="display: none;" class="tailoring-container">
+	<div class="black-cloth" onclick="closeTailor(this)"></div>
+	<div class="tailoring-content">
+		<div class="tailoring-content-one">
+			<label title="上传图片" for="chooseImg" class="l-btn choose-btn">
+				<input type="file" accept="image/jpg,image/jpeg,image/png" name="file" id="chooseImg" class="hidden" onchange="selectImg(this)">
+				选择头像
+			</label>
+			<div class="close-tailoring"  onclick="closeTailor(this)">×</div>
+		</div>
+		<div class="tailoring-content-two">
+			<div class="tailoring-box-parcel">
+				<img id="tailoringImg">
+			</div>
+			<div class="preview-box-parcel">
+				<p>头像预览：</p>
+				<div class="square previewImg"></div>
+				<div class="circular previewImg"></div>
+			</div>
+		</div>
+		<div class="tailoring-content-three">
+			<button class="l-btn cropper-reset-btn">还原</button>
+			<button class="l-btn cropper-rotate-btn">旋转</button>
+			<button class="l-btn cropper-scaleX-btn">换向</button>
+			<button class="l-btn sureCut" id="sureCut">确定</button>
+		</div>
+	</div>
+</div>
+<!--图片裁剪框 end-->
+<div style="width: 320px;height: 320px;border: solid 1px #555;padding: 5px;margin-top: 10px;display: none;">
+	<img id="finalImg" src="" width="100%">
+</div>
+<script type="text/javascript" src="./js/cropper.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //弹出框水平垂直居中
+        (window.onresize = function () {
+            var win_height = $(window).height();
+            var win_width = $(window).width();
+            if (win_width <= 768){
+                $(".tailoring-content").css({
+                    "top": (win_height - $(".tailoring-content").outerHeight())/2,
+                    "left": 0
+                });
+            }else{
+                $(".tailoring-content").css({
+                    "top": (win_height - $(".tailoring-content").outerHeight())/2,
+                    "left": (win_width - $(".tailoring-content").outerWidth())/2
+                });
+            }
+        })();
+        //cropper图片裁剪
+        $('#tailoringImg').cropper({
+            aspectRatio: 1/1,//默认比例
+            preview: '.previewImg',//预览视图
+            guides: false,  //裁剪框的虚线(九宫格)
+            autoCropArea: 0.5,  //0-1之间的数值，定义自动剪裁区域的大小，默认0.8
+            movable: false, //是否允许移动图片
+            dragCrop: true,  //是否允许移除当前的剪裁框，并通过拖动来新建一个剪裁框区域
+            movable: true,  //是否允许移动剪裁框
+            resizable: true,  //是否允许改变裁剪框的大小
+            zoomable: false,  //是否允许缩放图片大小
+            mouseWheelZoom: false,  //是否允许通过鼠标滚轮来缩放图片
+            touchDragZoom: true,  //是否允许通过触摸移动来缩放图片
+            rotatable: true,  //是否允许旋转图片
+            crop: function(e) {
+                // 输出结果数据裁剪图像。
+            }
+        });
+        //旋转
+        $(".cropper-rotate-btn").on("click",function () {
+            $('#tailoringImg').cropper("rotate", 45);
+        });
+        //复位
+        $(".cropper-reset-btn").on("click",function () {
+            $('#tailoringImg').cropper("reset");
+        });
+        //换向
+        var flagX = true;
+        $(".cropper-scaleX-btn").on("click",function () {
+            if(flagX){
+                $('#tailoringImg').cropper("scaleX", -1);
+                flagX = false;
+            }else{
+                $('#tailoringImg').cropper("scaleX", 1);
+                flagX = true;
+            }
+            flagX != flagX;
+        });
+
+        //裁剪后的处理
+        $("#sureCut").on("click",function () {
+            if ($("#tailoringImg").attr("src") == null ){
+                return false;
+            }else{
+                var cas = $('#tailoringImg').cropper('getCroppedCanvas');//获取被裁剪后的canvas
+                var base64url = cas.toDataURL('image/png'); //转换为base64地址形式
+                var user=app.getUserGlobalInfo();
+                $.ajax({
+                    url:"/u/uploadFaceBase64",
+                    data:JSON.stringify({
+                        userId:user.id,
+                        faceData:base64url
+                    }),
+                    type:"post",
+                    dataType:'json',
+                    timeout:10000,
+                    headers:{'Content-Type':'application/json'},
+                    success:function (data) {
+                        if(data.status==200){
+                            var userInfoJson = data.data;
+                            app.setUserGlobalInfo(userInfoJson);
+                            flashhead();
+                        }else{
+                            alert(data.msg);
+                        }
+
+                    }
+                });
+                // $("#finalImg").prop("src",base64url);//显示为图片的形式
+                //关闭裁剪框
+                closeTailor();
+            }
+        });
+    });
+    //弹出图片裁剪框
+    function showReplaceImg(){
+        $(".tailoring-container").toggle();
+    }
+    /*    $("#replaceImg").on("click",function () {
+            //方法切换元素的可见状态
+            $(".tailoring-container").toggle();
+        });*/
+    //选中图像
+    function selectImg(file) {
+        if (!file.files || !file.files[0]){
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            var replaceSrc = evt.target.result;
+            //更换cropper的图片
+            $('#tailoringImg').cropper('replace', replaceSrc,false);//默认false，适应高度，不失真
+        }
+        reader.readAsDataURL(file.files[0]);
+    }
+    //关闭裁剪框
+    function closeTailor() {
+        $(".tailoring-container").toggle();
+    }
+</script>
+
 </body>
 </html>
