@@ -348,10 +348,16 @@
 			</div>
 			<!--聊天内容-->
 				<div class="windows_body">
-				<div class="office_text" style="height: 100%;">
-					<ul class="content" id="chatbox">
-						<li class="me"><img src="images/own_head.jpg" title="金少凯"><span>疾风知劲草，板荡识诚臣</span></li>
-						<li class="other"><img src="images/head/15.jpg" title="张文超"><span>勇夫安知义，智者必怀仁</span></li>
+				<div class="office_text" style="height: 100%;"><!--{userId:userId,friendId:friendId,msg:msg,flag:flag}-->
+					<ul class="content" id="chatbox" v-for="userChatHistory in userChatHistoryList">
+						<li class="me" v-if="userChatHistory.flag==1">
+							<img src="images/own_head.jpg" title="金少凯">
+							<span v-html="userChatHistory.msg"></span>
+						</li>
+						<li class="other" v-if="userChatHistory.falg==2">
+							<img src="images/head/15.jpg" title="张文超">
+							<span v-html="userChatHistory.msg"></span>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -393,7 +399,9 @@
             ],
 			//当前聊天窗口
 			chatWindow:{},
-			unReadMessageList:[]//未读信息列表
+			unReadMessageList:[],//未读信息列表
+			userChatHistoryList:[],//当前聊天页面用户的聊天记录
+            userChatSnapshot:[],//用户聊天快照
         },
         mounted:function(){
             this.getUserGlobal();
@@ -407,20 +415,77 @@
           	this.getFriendList();
 		},
         methods:{
+			//渲染聊天页面
+			setChatPage:function(friendId){
+
+			},
+            //获取未读信息
             getUnReadMessage(){
                 axios.get('user/getUnReadMessage')
 					.then(function (value) {
                         if(response.data.status==200){
                             chatmodal.unReadMessageList=response.data.data;
+                            for(var a=0;a<chatmodal.unReadMessageList.length;a++){
+                            	var chat=chatmodal.unReadMessageList;
+								chatmodal.saveUserChatHistory(chat.sendId,chat.acceptId,chat.msg,2);
+                                chatmodal.saveUserChatSnapshot(chat.sendId,chat.acceptId,chat.msg,false);
+							}
                             return;
                         }
                         swal('系统出错了','','error');
 					}).catch(function (reason) {
                     swal('系统出错了','','error');
 				});
-
-
-
+			},
+			//保存聊天快照到本地数据库
+            saveUserChatSnapshot:function(userId,friendId,msg,unRead){
+				var chatKey="chat-snapshot-"+userId;
+				var chatSnapshotListStr=localStorage.getItem(chatKey);
+				var chatSnapshotList;
+				if(this.isNotNull(chatSnapshotListStr)){
+                    chatSnapshotList=JSON.parse(chatSnapshotListStr);
+                    for(var a=0;a<chatSnapshotList.length;a++){
+                        var chat=chatSnapshotList[a];
+                        if(chat.friendId==friendId){
+                            //删除旧的对象
+                            chatSnapshotList.splice(a,1);
+						}
+					}
+				}else{
+                    chatSnapshotList=[];
+				}
+				var chatSnapshot=CHAT.chatSnapshot(userId,friendId,msg,unRead);
+				//从头插入
+				chatSnapshotList.unshift(chatSnapshot);
+				localStorage.setItem(chatKey,JSON.stringify(chatSnapshotList));
+			},
+			//保存我和好友的聊天记录 flag1是我发的，2是对方发的
+            saveUserChatHistory:function(userId, friendId, msg, flag){
+			    var chatKey="chat-"+userId+"-"+friendId;
+				var chatHistoryListStr=localStorage.getItem(chatKey);
+                var chatHistoryList;
+				if(this.isNotNull(chatHistoryListStr)){
+					chatHistoryList=JSON.parse(chatHistoryListStr);
+				}else{
+				    chatHistoryList=[];
+				}
+				//获取单个聊天对象
+				var chatHistory=CHAT.chatHistory(userId,friendId,msg,flag);
+				chatHistoryList.push(chatHistory);
+				//保存到浏览器数据库
+				localStorage.setItem(chatKey,JSON.stringify(chatHistoryList));
+			},
+			//获取我和朋友的聊天记录
+			getUserChatHistory:function(userId, friendId){
+                var chatKey="chat-"+userId+"-"+friendId;
+                var chatHistoryListStr=localStorage.getItem(chatKey);
+                var chatHistoryList;
+                if(this.isNotNull(chatHistoryListStr)){
+                    chatHistoryList=JSON.parse(chatHistoryListStr);
+                }else{
+                    chatHistoryList=[];
+                }
+                return chatHistoryList;
 			},
             //发送信息
             sendMsg:function(friendId){
@@ -431,7 +496,13 @@
                	//构建聊天要发送的内容
                	var chatMsg=CHAT.getChatMsg(user.id,friendId,text,null);
                	var dataContent=CHAT.getDataContent(CHAT.CHAT,chatMsg,null);
+               	//发送给对方
 				CHAT.chat(JSON.stringify(dataContent));
+				//保存聊天记录
+                this.saveUserChatHistory(user.id,friendId,text,1);
+                //当前聊天页面渲染
+                this.userChatHistoryList=this.getUserChatHistory(user.id,friendId);
+
 			},
             //点击好友列表时触发的事件
             chatFriend:function(data){
@@ -442,6 +513,9 @@
 				  }
 			  }
 			  var aa=this.chatWindow;
+              var user=this.getUserGlobal();
+              //当前聊天页面渲染
+              this.userChatHistoryList=this.getUserChatHistory(user.id,data);
 			  setTimeout(function(){
 					  var UUE=UE.getEditor('input_box_', {
 						  autoHeightEnabled: false,
@@ -459,7 +533,6 @@
 					UUE.setContent('');
                 })
 			  },1);
-
 			},
             //获取全局的用户信息
             getUserGlobal:function(){

@@ -78,6 +78,14 @@ window.CHAT={
     //发送心跳包
     keeppalive:function () {
         
+    },
+    //单个聊天记录的对象 1是我发的，2是他发的
+    chatHistory:function (userId,friendId,msg,flag) {
+        return {userId:userId,friendId:friendId,msg:msg,flag:flag};
+    },
+    //快照对象 isRead用于判断是否已读
+    chatSnapshot:function (userId,friendId,msg,isRead) {
+        return {userId:userId,friendId:friendId,msg:isRead};
     }
 
 }
