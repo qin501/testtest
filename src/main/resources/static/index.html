@@ -503,6 +503,9 @@
                 //当前聊天页面渲染
                 this.userChatHistoryList=this.getUserChatHistory(user.id,friendId);
 
+                var scroll_div = document.getElementById("office_text");
+                scroll_div.scrollTop = scroll_div.scrollHeight;
+
 			},
             //点击好友列表时触发的事件
             chatFriend:function(data){

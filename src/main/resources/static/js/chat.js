@@ -59,7 +59,34 @@ window.CHAT={
     },
     //接收到信息时触发
     wsmessage:function (e) {
-        
+        //action:action,chatMsg:chatMsg,extand:extand
+        //接收到信息
+        var dataContent=JSON.parse(e.data);
+        var action=dataContent.action;
+        if(action==CHAT.ISLOGIN){
+            console.log("用户在其他地方登录")
+            return false;
+        }
+        //重新拉取好友列表
+        if(action=CHAT.PULL_FRIEND){
+            return false;
+        }
+        //{senderId:senderId,receiverId:receiverId,msg:msg,msgId:msgId}
+        // 获取聊天消息模型，渲染接收到的聊天记录
+        var chatMsg = dataContent.chatMsg;
+        //保存聊天记录
+        chatmodal.saveUserChatHistory(senderId,receiverId,msg,2);
+        var unRead=false;
+        if(chatmodal.isNotNull(chatmodal.chatWindow.id)){
+            if(chatmodal.chatWindow.id==receiverId){
+                unRead=true;
+            }
+        }
+        //保存聊天快照
+        chatmodal.saveUserChatSnapshot(senderId,receiverId,msg,unRead);
+        var scroll_div = document.getElementById("office_text");
+        scroll_div.scrollTop = scroll_div.scrollHeight;
+
     },
     //发送信息
     chat:function(msg){
