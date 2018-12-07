@@ -62,8 +62,9 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             UserService userService = (UserService) SpringUtil.getBean("userServiceImpl");
             String msgId = userService.saveMsg(chatMsg);
             chatMsg.setMsgId(msgId);
-            DataContent dataContentMsg = new DataContent();
-            dataContentMsg.setChatMsg(chatMsg);
+/*            chatMsg.setSenderId(receiverId);
+            chatMsg.setReceiverId(senderId);*/
+            dataContent.setChatMsg(chatMsg);
             // 发送消息
             // 从全局用户Channel关系中获取接受方的channel
             Channel receiverChannel = UserChannelRel.get(receiverId);
@@ -74,7 +75,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
                     // 用户在线
                     receiverChannel.writeAndFlush(
                             new TextWebSocketFrame(
-                                    JsonUtils.objectToJson(dataContentMsg)));
+                                    JsonUtils.objectToJson(dataContent)));
                 }
             }
         //消息签收

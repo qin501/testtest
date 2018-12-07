@@ -68,24 +68,28 @@ window.CHAT={
             return false;
         }
         //重新拉取好友列表
-        if(action=CHAT.PULL_FRIEND){
+        if(action==CHAT.PULL_FRIEND){
             return false;
         }
         //{senderId:senderId,receiverId:receiverId,msg:msg,msgId:msgId}
         // 获取聊天消息模型，渲染接收到的聊天记录
         var chatMsg = dataContent.chatMsg;
-        //保存聊天记录
-        chatmodal.saveUserChatHistory(senderId,receiverId,msg,2);
+        //保存聊天记录 senderId
+        chatmodal.saveUserChatHistory(chatMsg.receiverId,chatMsg.senderId,chatMsg.msg,2);
         var unRead=false;
         if(chatmodal.isNotNull(chatmodal.chatWindow.id)){
-            if(chatmodal.chatWindow.id==receiverId){
+            if(chatmodal.chatWindow.id==chatMsg.senderId){
+                var userChatHistory=chatmodal.getUserChatHistory(chatMsg.receiverId,chatMsg.senderId);
+                if(chatmodal.isNotNull(userChatHistory)){
+                    chatmodal.userChatHistoryList=userChatHistory;
+                }
                 unRead=true;
             }
         }
         //保存聊天快照
-        chatmodal.saveUserChatSnapshot(senderId,receiverId,msg,unRead);
-        var scroll_div = document.getElementById("office_text");
-        scroll_div.scrollTop = scroll_div.scrollHeight;
+        chatmodal.saveUserChatSnapshot(chatMsg.receiverId,chatMsg.senderId,chatMsg,unRead);
+        //var scroll_div = document.getElementById("office_text");
+        //scroll_div.scrollTop = scroll_div.scrollHeight;
 
     },
     //发送信息
