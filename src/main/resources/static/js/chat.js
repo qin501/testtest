@@ -130,6 +130,7 @@ window.CHAT={
         //加载未读信息
         //获取好友列表
         //获取好友请求
+        chatmodal.getAllLoading();
     },
     //单个聊天记录的对象 1是我发的，2是他发的
     chatHistory:function (userId,friendId,msg,flag) {
