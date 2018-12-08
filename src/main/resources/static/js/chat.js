@@ -7,7 +7,7 @@ window.CHAT={
             if(CHAT.socket!=null&&CHAT.socket!=undefined&&CHAT.socket.readyState==WebSocket.OPEN){
                 return false;
             }
-            CHAT.socket=new WebSocket('ws://localhost:8088/ws');
+            CHAT.socket=new WebSocket('ws://localhost:8090/ws');
             CHAT.socket.onopen=CHAT.wsopen;
             CHAT.socket.onclose=CHAT.wsclose;
             CHAT.socket.onerror=CHAT.wserror;
