@@ -63,4 +63,6 @@ public interface UserService {
     JSONResult getUnReadMessage(String id);
 
     JSONResult updateMsg(String senderId);
+
+    void updateImg(User userLogin);
 }

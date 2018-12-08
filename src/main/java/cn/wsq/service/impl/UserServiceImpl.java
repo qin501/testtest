@@ -21,6 +21,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,8 @@ public class UserServiceImpl implements UserService {
     private FriendrequestMapper friendrequestMapper;
     @Autowired
     private MsgMapper msgMapper;
+    @Value("${Faceicon}")
+    private String Faceicon;
 
     /*
     * offset从第几条开始
@@ -182,6 +185,7 @@ public class UserServiceImpl implements UserService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                user.setFaceicon(Faceicon);
                 userMapper.addUser(user);
             }else{
                 return JSONResult.errorMsg("用户名已存在，请重试");
@@ -348,6 +352,11 @@ public class UserServiceImpl implements UserService {
     public JSONResult updateMsg(String senderId) {
         msgMapper.meupdateMsg(senderId);
         return JSONResult.ok();
+    }
+
+    @Override
+    public void updateImg(User userLogin) {
+        userMapper.updateUser(userLogin);
     }
 
 }

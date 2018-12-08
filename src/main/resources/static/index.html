@@ -79,6 +79,10 @@
 			width: 20px;
 			height: 20px;
 		}
+		#chatbox.content li video{
+			width: 120px;
+			height: 120px;
+		}
 	</style>
 </head>
 <body>
@@ -92,16 +96,16 @@
 				<div class="am-dropdown-content">
 					<div class="own_head_top">
 						<div class="own_head_top_text">
-							<p class="own_name">{{userInfo.nickname}}<img src="images/icon/head.png" alt="" /></p>
+							<p class="own_name">{{userInfo.nickname}}<img v-bind:src="userInfo.faceicon" alt="" /></p>
 							<p class="own_numb">微信号：{{userInfo.username}}</p>
 						</div>
-						<img src="images/own_head.jpg" alt="" />
+						<img v-bind:src="userInfo.faceicon" alt="" />
 					</div>
 					<div class="own_head_bottom">
 						<p><span>地区</span>北京 天安门广场</p>
 						<div class="own_head_bottom_img">
-							<a href=""><img src="images/icon/head_1.png"/></a>
-							<a href=""><img src="images/icon/head_2.png"/></a>
+							<!--<a href=""><img src="images/icon/head_1.png"/></a>
+							<a href=""><img src="images/icon/head_2.png"/></a>-->
 						</div>
 					</div>
 				</div>
@@ -344,14 +348,27 @@
                 swal('用户没有登录','','error')
                 location.href='loginPage';
 			}*/
-          //获取好友请求表
+          //获取新好友请求表
           	this.getNewFriendList();
           	//获取好友列表
           	this.getFriendList();
           	//获取未读信息列表
           	this.getUnReadMessage();
+          	//获取左侧最近聊天列表
+			this.getUserChatHistoryList();
 		},
         methods:{
+            //获取左侧最近聊天列表
+            getUserChatHistoryList:function(){
+                var user=this.getUserGlobal();
+                var chatKey="chat-snapshot-"+user.id;
+                var chatSnapshotListStr=localStorage.getItem(chatKey);
+                var chatSnapshotList=[];
+                if(this.isNotNull(chatSnapshotListStr)) {
+                    chatSnapshotList = JSON.parse(chatSnapshotListStr);
+                }
+                this.userChatSnapshot=chatSnapshotList;
+			},
             //从左侧点击联系人，打开窗口
             openChatWindow:function(data){
                 for(var a=0;a<this.friendList.length;a++){
@@ -382,10 +399,6 @@
                         scroll_div.scrollTop = scroll_div.scrollHeight;
                     },1);
                 }
-
-			},
-			//渲染聊天页面
-			setChatPage:function(friendId){
 
 			},
             //获取未读信息
@@ -740,6 +753,16 @@ window.onload=function(){
 	b();
 	function init(){
         setTimeout("CHAT.init()",1000);
+        UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+        UE.Editor.prototype.getActionUrl = function(action) {
+            if (action == 'uploadimage' || action == 'uploadscrawl' || action == 'uploadimage') {
+                return 'uploadImage';
+            }else if(action=='uploadvideo'){
+                return '../../uploadImage';
+            } else {
+                return this._bkGetActionUrl.call(this, action);
+            }
+        };
 	};
 	init();
 
@@ -844,28 +867,20 @@ window.onload=function(){
             }else{
                 var cas = $('#tailoringImg').cropper('getCroppedCanvas');//获取被裁剪后的canvas
                 var base64url = cas.toDataURL('image/png'); //转换为base64地址形式
-                var user=app.getUserGlobalInfo();
-                $.ajax({
-                    url:"/u/uploadFaceBase64",
-                    data:JSON.stringify({
-                        userId:user.id,
-                        faceData:base64url
-                    }),
-                    type:"post",
-                    dataType:'json',
-                    timeout:10000,
-                    headers:{'Content-Type':'application/json'},
-                    success:function (data) {
-                        if(data.status==200){
-                            var userInfoJson = data.data;
-                            app.setUserGlobalInfo(userInfoJson);
-                            flashhead();
-                        }else{
-                            alert(data.msg);
+                var user=chatmodal.getUserGlobal();
+                axios.post('user/uploadFaceBase64',{'base64url':base64url})
+                    .then(function (response) {
+                        if(response.data.status==200){
+                            swal('上传头像成功','','success');
+                            //chatmodal.setUserGlobal(response.data.data);
+                            chatmodal.setUserGlobal(response.data.data);
+                            return;
                         }
-
-                    }
-                });
+                        swal('系统出错','','error');
+                    })
+                    .catch(function (error) {
+                        swal('系统出错','','error');
+                    })
                 // $("#finalImg").prop("src",base64url);//显示为图片的形式
                 //关闭裁剪框
                 closeTailor();

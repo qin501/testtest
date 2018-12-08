@@ -77,6 +77,8 @@ window.CHAT={
         var chatMsg = dataContent.chatMsg;
         //保存聊天记录 senderId
         chatmodal.saveUserChatHistory(chatMsg.receiverId,chatMsg.senderId,chatMsg.msg,2);
+        //对收到的信息签收
+        CHAT.signMsgList();
         var unRead=false;
         if(chatmodal.isNotNull(chatmodal.chatWindow.id)){
             //如果是当前窗口是接收者
@@ -121,7 +123,13 @@ window.CHAT={
     },
     //发送心跳包
     keeppalive:function () {
-        
+        // 构建对象
+        var dataContent = CHAT.getDataContent(CHAT.KEEPALIVE, null, null);
+        // 发送心跳
+        CHAT.chat(JSON.stringify(dataContent));
+        //加载未读信息
+        //获取好友列表
+        //获取好友请求
     },
     //单个聊天记录的对象 1是我发的，2是他发的
     chatHistory:function (userId,friendId,msg,flag) {

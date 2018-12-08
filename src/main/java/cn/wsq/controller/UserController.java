@@ -1,16 +1,21 @@
 package cn.wsq.controller;
 
 import cn.wsq.entity.Friends;
+import cn.wsq.entity.UploadImg;
 import cn.wsq.entity.User;
 import cn.wsq.service.UserService;
 import cn.wsq.util.JSONResult;
+import cn.wsq.util.JerseyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Random;
 
 /*
 * 用户功能
@@ -20,6 +25,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Value("${WebImgServerUrl}")
+    private String WebImgServerUrl;
     /*
     * 用户登录实现
     * */
@@ -139,6 +146,42 @@ public class UserController {
         }
         JSONResult result= userService.getUnReadMessage(userLogin.getId());
         return result;
+    }
+    /*
+    * 用户上传头像
+    * */
+    @RequestMapping("uploadFaceBase64")
+    public JSONResult uploadFaceBase64(@RequestBody UploadImg uploadImg, HttpServletRequest request){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        String base64url = uploadImg.getBase64url();
+        //图片名
+        long millis = System.currentTimeMillis();
+        Random random = new Random();
+        int nextInt = random.nextInt(10);
+        String name = "JMPT" + millis + nextInt;
+        String url=WebImgServerUrl+name+".jpg";
+        String thumpImgUrl="";
+        thumpImgUrl=url;
+        //MultipartFile faceFile = FileUtils.fileToMultipart(userFacePath);
+        String [] d = base64url.split("base64,");
+        String dataPrix = "";
+        String data = "";
+        if(d != null && d.length == 2){
+            dataPrix = d[0];
+            data = d[1];
+        }else{
+            // return false;
+        }
+        byte[] bytes = Base64Utils.decodeFromString(data);
+
+        JerseyUtils.upload(url,bytes);
+        userLogin.setFaceicon(url);
+        userService.updateImg(userLogin);
+        // 更新用户头像
+        return JSONResult.ok(userLogin);
     }
 
 }
