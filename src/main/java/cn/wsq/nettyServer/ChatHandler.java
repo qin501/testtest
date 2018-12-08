@@ -2,6 +2,7 @@ package cn.wsq.nettyServer;
 
 import cn.wsq.SpringUtil;
 import cn.wsq.service.UserService;
+import cn.wsq.util.JSONResult;
 import cn.wsq.util.JsonUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -81,25 +82,10 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         //消息签收
         } else if (action == MsgActionEnum.SIGNED.type) {
             // 签收消息类型，针对具体的消息进行签收，修改数据库中对应消息的签收状态[已签收]
-
+            String extand = dataContent.getExtand();
             UserService userService = (UserService) SpringUtil.getBean("userServiceImpl");
-            // 扩展字段在signed类型的消息中，代表需要去签收的消息id，逗号间隔
-            String msgIdsStr = dataContent.getExtand();
-            String msgIds[] = msgIdsStr.split(",");
-
-            List<String> msgIdList = new ArrayList<>();
-            for (String mid : msgIds) {
-                if (StringUtils.isNotBlank(mid)) {
-                    msgIdList.add(mid);
-                }
-            }
-
-            System.out.println("好友在线列表"+msgIdList.toString());
-
-            if (msgIdList != null && !msgIdList.isEmpty() && msgIdList.size() > 0) {
-                // 批量签收
-               // userService.updateMsgSigned(msgIdList);
-            }
+            JSONResult result=userService.updateMsg(extand);
+            System.out.println("签收消息的状态"+result.getStatus());
         //客户端保持心跳
         } else if (action == MsgActionEnum.KEEPALIVE.type) {
             // 心跳类型的消息
@@ -131,6 +117,4 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         ctx.channel().close();
         users.remove(ctx.channel());
     }
-
-
 }

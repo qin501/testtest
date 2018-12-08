@@ -64,6 +64,7 @@ window.CHAT={
         var dataContent=JSON.parse(e.data);
         var action=dataContent.action;
         if(action==CHAT.ISLOGIN){
+            location.href='loginPage'
             console.log("用户在其他地方登录")
             return false;
         }
@@ -107,6 +108,16 @@ window.CHAT={
     //消息重新发送
     reChat:function (msg) {
         CHAT.socket.send(msg);
+    },
+    //对未读信息签收
+    signMsgList:function(){
+        var user=chatmodal.getUserGlobal();
+        //构建聊天要发送的内容
+        var chatMsg=CHAT.getChatMsg(user.id,null,null,null);
+        //构建聊天要发送的内容
+        var dataContent=CHAT.getDataContent(CHAT.SIGNED,null,user.id);
+        //发送给对方
+        CHAT.chat(JSON.stringify(dataContent));
     },
     //发送心跳包
     keeppalive:function () {

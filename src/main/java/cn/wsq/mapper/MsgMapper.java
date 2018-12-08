@@ -31,4 +31,6 @@ public interface MsgMapper {
     public Msg getMsgById(String id);
     //精确查询
     public List<Msg> queryByEntity(Msg msg);
+
+    void meupdateMsg(String senderId);
 }

@@ -61,4 +61,6 @@ public interface UserService {
     String saveMsg(ChatMsg chatMsg);
 
     JSONResult getUnReadMessage(String id);
+
+    JSONResult updateMsg(String senderId);
 }

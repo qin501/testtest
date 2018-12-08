@@ -140,4 +140,8 @@
         </where>
     </select>
 
+    <update id="meupdateMsg" parameterType="String">
+        update msg set signFlag=2 where acceptId=#{value}
+    </update>
+
 </mapper>

@@ -274,47 +274,6 @@
 				</ul>
 			</div>	
 		</div>
-		
-		<!--程序列表-->
-<!--		<div class="middle">
-			<div class="wx_search">
-				<input type="text" placeholder="搜索收藏内容"/>
-				<button>+</button>
-			</div>
-			<div class="office_text">
-				<ul class="icon_list">
-					<li class="icon_active">
-						<div class="icon"><img src="images/icon/icon.png" alt="" /></div>
-						<span>全部收藏</span>
-					</li>
-					<li>
-						<div class="icon"><img src="images/icon/icon1.png" alt="" /></div>
-						<span>链接</span>
-					</li>
-					<li>
-						<div class="icon"><img src="images/icon/icon2.png" alt="" /></div>
-						<span>相册</span>
-					</li>
-					<li>
-						<div class="icon"><img src="images/icon/icon3.png" alt="" /></div>
-						<span>笔记</span>
-					</li>
-					<li>
-						<div class="icon"><img src="images/icon/icon4.png" alt="" /></div>
-						<span>文件</span>
-					</li>
-					<li>
-						<div class="icon"><img src="images/icon/icon5.png" alt="" /></div>
-						<span>音乐</span>
-					</li>
-					<li>
-						<div class="icon"><img src="images/icon/icon6.png" alt="" /></div>
-						<span>标签</span>
-					</li>
-				</ul>
-			</div>	
-		</div>-->
-	
 		<!--聊天窗口-->
 		<div class="talk_window" v-if="chatWindow.id!=null && chatWindow.id!=undefined">
 			<div class="windows_top">
@@ -389,6 +348,8 @@
           	this.getNewFriendList();
           	//获取好友列表
           	this.getFriendList();
+          	//获取未读信息列表
+          	this.getUnReadMessage();
 		},
         methods:{
             //从左侧点击联系人，打开窗口
@@ -401,6 +362,25 @@
                     var user=this.getUserGlobal();
                     //当前聊天页面渲染
                     this.userChatHistoryList=this.getUserChatHistory(user.id,data);
+                    setTimeout(function(){
+                        var UUE=UE.getEditor('input_box_', {
+                                autoHeightEnabled: false,
+                                initialFrameHeight: 60,
+                                initialFrameWidth: 550,
+                                elementPathEnabled: false,
+                                wordCount: false,
+                                maximumWords:100,
+                                toolbars: [[
+                                    'source','undo','redo','emotion','simpleupload','map','insertvideo'
+                                ]]
+                            }
+                        );
+                        UUE.ready(function () {
+                            UUE.setContent('');
+                        })
+                        var scroll_div = document.getElementById("scroll_div");
+                        scroll_div.scrollTop = scroll_div.scrollHeight;
+                    },1);
                 }
 
 			},
@@ -411,14 +391,16 @@
             //获取未读信息
             getUnReadMessage(){
                 axios.get('user/getUnReadMessage')
-					.then(function (value) {
+					.then(function (response) {
                         if(response.data.status==200){
                             chatmodal.unReadMessageList=response.data.data;
                             for(var a=0;a<chatmodal.unReadMessageList.length;a++){
-                            	var chat=chatmodal.unReadMessageList;
-								chatmodal.saveUserChatHistory(chat.sendId,chat.acceptId,chat.msg,2);
-                                chatmodal.saveUserChatSnapshot(chat.sendId,chat.acceptId,chat.msg,false);
+                            	var chat=chatmodal.unReadMessageList[a];
+								chatmodal.saveUserChatHistory(chat.acceptId,chat.sendId,chat.msg,2);
+                                chatmodal.saveUserChatSnapshot(chat.acceptId,chat.sendId,chat.msg,false);
 							}
+                            //更新消息为已签收
+                            CHAT.signMsgList();
                             return;
                         }
                         swal('系统出错了','','error');
@@ -735,12 +717,12 @@ window.onload=function(){
 		si1.onclick=function(){
 			si1.style.background="url(images/icon/head_2_1.png) no-repeat"
 			si2.style.background="";
-			si3.style.background="";
+			//si3.style.background="";
 		};
 		si2.onclick=function(){
 			si2.style.background="url(images/icon/head_3_1.png) no-repeat"
 			si1.style.background="";
-			si3.style.background="";
+			//si3.style.background="";
 		};
 		/*si3.onclick=function(){
 			si3.style.background="url(images/icon/head_4_1.png) no-repeat"

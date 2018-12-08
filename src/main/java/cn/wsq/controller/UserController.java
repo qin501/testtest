@@ -129,7 +129,7 @@ public class UserController {
         return result;
     }
     /*
-    *
+    *获取未读信息列表
     * */
     @RequestMapping("getUnReadMessage")
     public JSONResult getUnReadMessage(HttpServletRequest request){

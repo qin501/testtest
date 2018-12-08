@@ -336,11 +336,18 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.REQUIRED)
     public JSONResult getUnReadMessage(String id) {
         Msg msg = new Msg();
-        msg.setSendId(id);
+        msg.setAcceptId(id);
         msg.setSignFlag(1);
         List<Msg> msgs = msgMapper.queryByEntity(msg);
         JSONResult result=JSONResult.ok(msgs);
         return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public JSONResult updateMsg(String senderId) {
+        msgMapper.meupdateMsg(senderId);
+        return JSONResult.ok();
     }
 
 }
