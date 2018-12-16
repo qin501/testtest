@@ -70,6 +70,8 @@ window.CHAT={
         }
         //重新拉取好友列表
         if(action==CHAT.PULL_FRIEND){
+            chatmodal.getNewFriendList();
+            chatmodal.getFriendList();
             return false;
         }
         //{senderId:senderId,receiverId:receiverId,msg:msg,msgId:msgId}

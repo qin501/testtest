@@ -90,6 +90,19 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         } else if (action == MsgActionEnum.KEEPALIVE.type) {
             // 心跳类型的消息
             System.out.println("收到来自channel为[" + currentChannel + "]的心跳包...");
+        //刷新对方的新好友列表
+        }else if(action==MsgActionEnum.PULL_FRIEND.type){
+            ChatMsg chatMsg = dataContent.getChatMsg();
+            String receiverId = chatMsg.getReceiverId();
+            Channel channel = UserChannelRel.get(receiverId);
+            if(channel!=null){
+                Channel friendChannel = users.find(channel.id());
+                if(friendChannel!=null){
+                    DataContent c = new DataContent();
+                    c.setAction(MsgActionEnum.PULL_FRIEND.type);
+                    channel.writeAndFlush(new TextWebSocketFrame(JsonUtils.objectToJson(c)));
+                }
+            }
         }
 
     }

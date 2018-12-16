@@ -25,8 +25,8 @@ public class JSPController {
             System.out.println(path);
             System.out.println("new file:"+new File("").getAbsolutePath());
             response.setContentType("application/json");
-            String exec = new ActionEnter(request,path ).exec();
-            //String exec = new ActionEnter(request,new File("").getAbsolutePath()+File.separator).exec();
+            //String exec = new ActionEnter(request,path ).exec();
+            String exec = new ActionEnter(request,new File("").getAbsolutePath()+File.separator).exec();
             PrintWriter writer = response.getWriter();
             writer.write(exec);
             writer.flush();

@@ -222,7 +222,7 @@
 		<!--聊天列表-->
 		<div class="middle on">
 			<div class="wx_search">
-				<input type="text" placeholder="搜索"/>
+				<input type="text" placeholder="搜索功能没有实现"/>
 				<button>+</button>
 			</div>
 			<div class="office_text">
@@ -234,7 +234,15 @@
 								<img v-bind:src="friend.faceicon"/>
 							</div>
 							<div class="user_text">
-								<p class="user_name" >{{friend.nickname}}</p>
+								<p class="user_name" v-if="!chatSnapshot.isRead" >
+									<!--userId:userId,friendId:friendId,msg:msg,isRead:isRead-->
+									<span class="red-point" >
+										{{friend.nickname}}
+									</span>
+								</p>
+								<p class="user_name" v-else>
+									{{friend.nickname}}
+								</p>
 								<p class="user_message" v-html="chatSnapshot.msg" style="height: 20px"></p>
 							</div>
 							<!--<div class="user_time">昨天</div>-->
@@ -247,7 +255,7 @@
 		<!--好友列表-->
 		<div class="middle" id="friendList">
 			<div class="wx_search">
-				<input type="text" placeholder="搜索"/>
+				<input type="text" placeholder="搜索功能没有实现"/>
 				<button>+</button>
 			</div>
 			<div class="office_text">
@@ -290,11 +298,11 @@
 				<div class="office_text" style=" overflow:scroll;  height:492px;" id="scroll_div"><!--{userId:userId,friendId:friendId,msg:msg,flag:flag}-->
 					<ul class="content" id="chatbox" v-for="userChatHistory in userChatHistoryList">
 						<li class="me" v-if="userChatHistory.flag==1">
-							<img src="images/own_head.jpg" title="金少凯">
+							<img src="images/own_head.jpg" title="xxx">
 							<span v-html="userChatHistory.msg"></span>
 						</li>
 						<li class="other" v-if="userChatHistory.flag==2">
-							<img src="images/head/15.jpg" title="张文超">
+							<img src="images/head/15.jpg" title="xxx">
 							<span v-html="userChatHistory.msg"></span>
 						</li>
 					</ul>
@@ -344,10 +352,10 @@
         },
         mounted:function(){
             this.getUserGlobal();
-          /*  if(this.userInfo==null||this.userInfo.id==null||typeof (this.userInfo.id)=='undefined'){
+            if(this.userInfo==null||this.userInfo.id==null||typeof (this.userInfo.id)=='undefined'){
                 swal('用户没有登录','','error')
                 location.href='loginPage';
-			}*/
+			}
           //获取新好友请求表
           	this.getNewFriendList();
           	//获取好友列表
@@ -380,6 +388,34 @@
                 }
                 this.userChatSnapshot=chatSnapshotList;
 			},
+            //标志信息为已读的状态
+            readUserChatSnapshot:function(userId,friendId){
+                var chatKey="chat-snapshot-"+userId;
+                var chatSnapshotListStr=localStorage.getItem(chatKey);
+                var chatSnapshotList;
+                var currentFriend={};
+                if(this.isNotNull(chatSnapshotListStr)){
+                    chatSnapshotList=JSON.parse(chatSnapshotListStr);
+                    for(var a=0;a<chatSnapshotList.length;a++){
+                        var chat=chatSnapshotList[a];
+                        if(chat.friendId==friendId){
+                            currentFriend=chat;
+                            //删除旧的对象
+                            currentFriend=chatSnapshotList.splice(a,1);
+                        }
+                    }
+                }else{
+                    chatSnapshotList=[];
+                }
+                console.log(currentFriend.isRead)
+				console.log(currentFriend[0]);
+                console.log(currentFriend)
+                currentFriend[0].isRead=true;
+                //从头插入
+                chatSnapshotList.unshift(currentFriend[0]);
+                localStorage.setItem(chatKey,JSON.stringify(chatSnapshotList));
+                chatmodal.userChatSnapshot=chatSnapshotList;
+			},
             //从左侧点击联系人，打开窗口
             openChatWindow:function(data){
                 for(var a=0;a<this.friendList.length;a++){
@@ -388,6 +424,10 @@
                         this.chatWindow=this.friendList[a];
                     }
                     var user=this.getUserGlobal();
+
+                    //标志信息为已读的状态
+					this.readUserChatSnapshot(user.id,data);
+
                     //当前聊天页面渲染
                     this.userChatHistoryList=this.getUserChatHistory(user.id,data);
                     setTimeout(function(){
@@ -628,6 +668,10 @@
                                     swal('已经成功添加好友','','success');
                                     //刷新所有
                                     chatmodal.getAllLoading();
+                                    var chatMsg=CHAT.getChatMsg(null,friendId,null,null);
+                                    var dataContent=CHAT.getDataContent(CHAT.PULL_FRIEND,chatMsg,null);
+                                    //发送给对方
+                                    CHAT.chat(JSON.stringify(dataContent));
                                     return;
                                 }
                                 swal('系统出错了','','error');
@@ -659,6 +703,10 @@
                     .then(function (response) {
                         if(response.data.status==200){
                             swal('已经发送成功','','success');
+                            var chatMsg=CHAT.getChatMsg(null,chatmodal.userId,null,null);
+                            var dataContent=CHAT.getDataContent(CHAT.PULL_FRIEND,chatMsg,null);
+                            //发送给对方
+                            CHAT.chat(JSON.stringify(dataContent));
                             return;
                         }
                         swal('系统出错了','','error');
