@@ -65,4 +65,6 @@ public interface UserService {
     JSONResult updateMsg(String senderId);
 
     void updateImg(User userLogin);
+
+    JSONResult updateFriendAlias(Friends friendnote);
 }

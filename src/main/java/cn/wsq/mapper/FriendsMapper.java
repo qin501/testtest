@@ -34,4 +34,6 @@ public interface FriendsMapper {
     public List<Friends> queryByEntity(Friends friends);
 
     List<User> queryByUserId(String id);
+
+    void updateFriendAlias(Friends friendnote);
 }

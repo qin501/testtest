@@ -17,7 +17,7 @@
     <!--vue2.0推荐我的使用的ajax-->
     <script src="./js/axios.min.js"></script>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
 	<script src="js/pinyin.js"></script>
 	<script type="text/javascript" charset="utf-8" src="ueditor.config.js"></script>
 	<script type="text/javascript" charset="utf-8" src="./ueditor.all.min.js"> </script>
@@ -83,6 +83,114 @@
 			width: 120px;
 			height: 120px;
 		}
+		/*复选框*/
+
+		.gcs-checkbox {
+
+			display: none;
+
+		}
+
+		.gcs-checkbox+label {
+
+			background-color: white;
+
+			border-radius: 0px;
+
+			border: 1px solid #d3d3d3;
+
+			width: 20px;
+
+			height: 20px;
+
+			display: inline-block;
+
+			text-align: center;
+
+			vertical-align: bottom;
+
+			line-height: 20px;
+
+		}
+
+		.gcs-checkbox+label:hover {
+
+			cursor: pointer;
+
+			border: 1px solid #2783FB;
+
+		}
+
+		.gcs-checkbox:checked+label {
+
+			background-color: #eee;
+
+			background: #2783FB;
+
+		}
+
+		.gcs-checkbox:checked+label:after {
+
+			content: "\2714";
+
+			color: white;
+
+		}
+
+		/*单选按钮*/
+
+		.gcs-radio {
+
+			display: none;
+
+		}
+
+		.gcs-radio+label {
+
+			width: 20px;
+
+			height: 20px;
+
+			line-height: 20px;
+
+			display: inline-block;
+
+			text-align: center;
+
+			vertical-align: bottom;
+
+			border: 1px solid gray;
+
+			border-radius: 50%;
+
+		}
+
+		.gcs-radio+label:hover {
+
+			border: 1px solid #2783FB;
+
+			cursor: pointer;
+
+		}
+
+		.gcs-radio:checked+label {
+
+			background: #2783FB;
+
+			border: 1px solid #2783FB;
+
+		}
+
+		.gcs-radio:checked+label:after {
+
+			content: "\2022";
+
+			font-size: 35px;
+
+			color: white;
+
+		}
+
 	</style>
 </head>
 <body>
@@ -169,7 +277,36 @@
 						</li>
 
 						<li itemId="thrr">
-							<a href="javascript:void(0)" onclick="showReplaceImg()">修改头像</a>
+							<a href="javascript:void(0)" onclick="showReplaceImg()">上传头像</a>
+						</li>
+						<li itemId="fff">
+							<a href="javascript: void(0)"  data-am-modal="{target: '#doc-modal-6', closeViaDimmer: 0, width: 400, height: 300}">好友备注</a>
+							<div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-6">
+								<div class="am-modal-dialog">
+									<div class="am-modal-hd">修改备注
+										<a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+									</div>
+									<div class="am-modal-bd">
+										<div class="modal-body">
+											<div class="form-group">
+												<select name="nickname" v-model="friendnote.friendId" class="form-control" >
+													<option disabled value="">-----请选择好友-----</option>
+													<option v-for="friend in friendList" v-bind:value="friend.id" >
+														{{friend.nickname}}
+													</option>
+												</select>
+											</div>
+											<div class="form-group">
+												<input type="text" name="txt_departmentname" v-model="friendnote.alias" class="form-control" id="nickname" placeholder="昵称">
+											</div>
+											<div class="modal-footer">
+												<button type="button" id="alias_submit" v-on:click="updateFriendAlias" class="btn btn-primary" data-dismiss="modal" data-am-modal-close>确认</button>
+												<button type="button" id="nickname_cancel" v-on:click="nick_cancel" class="btn btn-default" data-dismiss="modal"  data-am-modal-close>取消</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</li>
 
 
@@ -317,10 +454,10 @@
 
 			</div>
 		</div>
-	</div>
+
+		</div>
 
 </div>
-
 <script>
     var chatmodal=new Vue({
         el:'#webchat',
@@ -349,6 +486,7 @@
 			unReadMessageList:[],//未读信息列表
 			userChatHistoryList:[],//当前聊天页面用户的聊天记录
             userChatSnapshot:[],//用户聊天快照
+			friendnote:{friendId:'',alias:''}//朋友备注
         },
         mounted:function(){
             this.getUserGlobal();
@@ -366,6 +504,30 @@
 			this.getUserChatHistoryList();
 		},
         methods:{
+            //修改好友别名
+            updateFriendAlias:function(){
+                if(this.friendnote.alias.length==0){
+                    swal('备注不能为空','','info');
+                    return;
+				}
+				if(this.friendnote.friendId.length==0){
+                    swal('请选择要修改备注的好友','','info');
+				}
+				//axios
+				axios.post('user/updateFriendAlias',this.friendnote)
+					.then(function (response) {
+                        if(response.data.status==200){
+                            swal('修改成功','','success');
+                            //刷新所有
+                            chatmodal.getAllLoading();
+                            return;
+                        }
+                        swal('系统出错了','','error');
+					})
+					.catch(function (reason) {
+                        swal('系统出错了','','error');
+					})
+			},
             //获取所有要加载的内容
             getAllLoading:function(){
 				//获取新好友请求表

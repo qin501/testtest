@@ -119,4 +119,8 @@
     friends.userId=#{value}
     </select>
 
+    <update id="updateFriendAlias" parameterType="friends">
+        update friends set alias=#{alias} where userId=#{userId} and friendId=#{friendId}
+    </update>
+
 </mapper>

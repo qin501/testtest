@@ -183,5 +183,18 @@ public class UserController {
         // 更新用户头像
         return JSONResult.ok(userLogin);
     }
+    /*
+    * 修改好友备注
+    * */
+    @RequestMapping("updateFriendAlias")
+    public JSONResult updateFriendAlias(HttpServletRequest request,@RequestBody Friends friendnote){
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        if(userLogin==null){
+            return JSONResult.errorMsg("用户没有登录");
+        }
+        friendnote.setUserId(userLogin.getId());
+        JSONResult result=userService.updateFriendAlias(friendnote);
+        return result;
+    }
 
 }

@@ -355,8 +355,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void updateImg(User userLogin) {
         userMapper.updateUser(userLogin);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public JSONResult updateFriendAlias(Friends friendnote) {
+        friendsMapper.updateFriendAlias(friendnote);
+        return JSONResult.ok();
     }
 
 }
